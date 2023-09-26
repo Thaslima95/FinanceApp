@@ -1,11 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
-import Dashboard from './Dashboard';
+import IncomeDashboard from './Income/IncomeDashboard';
+import ExpenseDashboard from './Expense/ExpenseDashboard'
 
 
 function App() {
   return (
-    <Dashboard/>
+    <IncomeDashboard/>
   );
 }
 

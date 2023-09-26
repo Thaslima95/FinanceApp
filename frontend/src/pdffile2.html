@@ -18,7 +18,7 @@
             border: 1px solid #eee;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
             font-size: 14px;
-            line-height: 24px;
+            line-height: 20px;
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
             color:black;
         }
@@ -39,19 +39,19 @@
         }
 
         .invoice-box table tr.top table td {
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             
         }
 
         .invoice-box table tr.top table td.title {
             font-size: 45px;
-            line-height: 35px;
+            line-height: 25px;
             color: black;
             
         }
 
         .invoice-box table tr.information table td {
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             
         }
 
@@ -110,6 +110,8 @@
 </head>
 
 <body>
+   
+   
     <div class="invoice-box">
         <table cellpadding="0" cellspacing="0">
             <tr class="top">
@@ -117,14 +119,14 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="../src/assets/Images/logo.png"
+                                <img src="./logo.png"
                                     style="width: 100%; max-width: 300px" />
                             </td>
 
                             <td>
                                 <br/>
-                                <span style="font-size: 30px;">TAX INVOICE</span><br />
-                                PS/23՞24/0025
+                                <span  style="font-size: 30px;">TAX INVOICE</span><br />
+                                <span>PS/<span id="psyear">${data[0].PSYear}</span><span id="invoiceid">/00${data[0].id}</span></span>
 <br />
                             </td>
                         </tr>
@@ -145,7 +147,7 @@
 
                             <td>
                                 Balance Due<br />
-                                Rs.100<br />
+                                <span id="balancedue">Rs.${data[0].BalanceDue}</span><br />
                                 
                             </td>
                         </tr>
@@ -158,11 +160,11 @@
                         <tr>
                             <td>
                                 Bill To <br/>
-                                llllllll Consulting Private Limited<br />
-                                Maan Sarovar Tower First Floor 375 271a Scheme Road Teynampet<br />
-                                Chennai<br />
-                                Tamil Nadu ՞ 600018<br />
-                                GSTIN 33AAICA9829J1ZB
+                                <span id="companyname">${data[0].CompanyName}</span><br />
+                                <span id="streetaddress">${data[0].StreetAddress}</span><br />
+                                <span id="city">${data[0].City}</span><br />
+                                <span id="state">TamilNadu</span> -<span id="pincode">${data[0].Pincode}</span><br />
+                                GSTIN <span id="gstin">${data[0].GSTIN}</span>
                             </td>
             
                             <td>
@@ -179,10 +181,11 @@
                                 
                                 Due Date:
                             </td>
-                                        <td>31/08/2023
+                                        <td >
+                                            ${data[0].CreatedAt}
                                             <br/>
                                             <br />
-                                            02/09/2023
+                                            ${data[0].DueDate}
 
                                         </td>
                                     </tr>
@@ -202,7 +205,7 @@
                 <td>
                     Shipt To <br />
                     <br />
-                    Place Of Supply: Tamil Nadu
+                    Place Of Supply: <span id="placeofsupply">${data[0].PlaceofSupply}</span>
 
                 </td>
 
@@ -214,8 +217,8 @@
 <tr class="information">
     <table>
         <th>#</th>
-        <th>Item & Description</th>
-        <th>HSN/SAC</th>
+        <th >Item & Description</th>
+        <th >HSN/SAC</th>
         <th>Rate</th>
         <th>CGST</th>
         <th>SGST</th>
@@ -224,16 +227,18 @@
         <tbody>
             <tr>
                 <td>1</td>
-                <td>Monthly Retainer - Sateesh (0,0)&One Mid Level Developer (0,00)</td>
-                <td>998314</td>
-                <td>342,581</td>
-                <td>12 <br>
-                    9.00%</td>
-                <td>12 <br>
-                    9.00%</td>
-                <td>12 <br>
-                    9.00%</td>
-                <td>123.0</td>
+                <td id="items">${data[0].Items}</td>
+                <td id="hsnsac">${data[0].HSNSAC}</td>
+                <td id="rate">${data[0].Rate}</td>
+                <td id="cgst">${(data[0].CGST/100)*data[0].Amount}<br>
+                    <span id="cgst">${data[0].CGST}</span><span>%</span></td>
+                <td id="sgst">${(data[0].SGST/100)*data[0].Amount} <br>
+                    <span id="sgst">${data[0].SGST}</span><span>%</span>
+                </td>
+                <td id="igst">${(data[0].IGST/100)*data[0].Amount} <br>
+                    <span id="igst">${data[0].IGST}</span><span>%</span>
+                </td>
+                <td id="amount">${data[0].Amount}</td>
             </tr>
         </tbody>
     </table>
@@ -286,16 +291,20 @@
                                     <tr>
                                         <td>Sub Total <br />
                                 
-                                            CGST (9%)
+                                            CGST <span>(</span><span id="cgst">${data[0].CGST}</span><span>%)</span>
                                             <br />
                                 
-                                            SGST(9%) <br/>
+                                            SGST<span>(</span><span id="sgst">${data[0].SGST}</span><span>%)</span><br/>
+                                            IGST<span>(</span><span id="igst">${data[0].IGST}</span><span>%)</span><br />
+                                            Total <br/>
                                             Balance Due
                                         </td>
-                                        <td>12.00 <br/>
-                                            12 <br/>
-                                            12 <br/>
-                                            2.00
+                                        <td>12 <br/>
+                                            ${(data[0].CGST/100)*data[0].Amount} <br/>
+                                            ${(data[0].SGST/100)*data[0].Amount} <br/>
+                                            ${(data[0].IGST/100)*data[0].Amount} <br />
+                                            totalvalue <br/>
+                                            <span id="balancedue">${data[0].BalanceDue}</span>
                                 
                                         </td>
                                     </tr>
@@ -342,6 +351,9 @@
             </tr>
             </table>
             </div>
+         
+          
 </body>
+
 
 </html>

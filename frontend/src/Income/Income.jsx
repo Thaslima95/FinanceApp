@@ -16,6 +16,7 @@ import {
 } from "@mui/x-data-grid";
 import { randomCreatedDate, randomId } from "@mui/x-data-grid-generator";
 import { useEffect, useState, useRef } from "react";
+import ApiCalls from "../API/ApiCalls";
 let initialRows = [];
 
 function EditToolbar(props) {
@@ -57,7 +58,7 @@ function EditToolbar(props) {
   );
 }
 
-export default function Income2() {
+export default function Income() {
   const [rows, setRows] = useState(initialRows);
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
@@ -105,36 +106,30 @@ export default function Income2() {
   };
 
   const processRowUpdate = (newRow) => {
+    console.log(newRow);
     const totalvalue =
-      (newRow.CGST / newRow.Amount) * 100 +
-      (newRow.SGST / newRow.Amount) * 100 +
-      (newRow.IGST / newRow.Amount) * 100 +
+      (newRow.CGST / 100) * newRow.Amount +
+      (newRow.SGST / 100) * newRow.Amount +
+      (newRow.IGST / 100) * newRow.Amount +
       newRow.Amount;
     const updatedRow = {
       ...newRow,
       TotalAmount: totalvalue,
+      BalanceDue: newRow.Amount,
       isNew: false,
     };
     newRow.TotalAmount = totalvalue;
+    newRow.BalanceDue = newRow.Amount;
 
-    // setRows(
-    //   rows.map((row) =>
-    //     row.id === newRow.id ? console.log(updatedRow) : console.log(row)
-    //   )
-    // );
-    // console.log(rows.filter((row) => row.id === newRow.id));
-    // rows.map((row) => row.id === newRow.id && updaterow());
-    // console.log(rows.includes(newRow.id));
     if (actionTake) {
-      axios
-        .put(`/updateincome/${newRow.id}`, newRow)
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+      ApiCalls.updateIncome(newRow.id, newRow)
+        .then((res) => window.alert("record updated sucess"))
+        .catch((err) => window.alert("Oops! some error occured"));
+      window.location.reload();
     } else {
-      axios
-        .post("/addincome", newRow)
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+      ApiCalls.addIncome(newRow)
+        .then((res) => window.alert("record added sucess"))
+        .catch((err) => window.alert("Oops! some error occured"));
       window.location.reload();
     }
     return updatedRow;
@@ -145,11 +140,87 @@ export default function Income2() {
   };
 
   const columns = [
-    { field: "From", headerName: "From", width: 120, editable: true },
+    {
+      field: "CompanyName",
+      headerName: "CompanyName",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "StreetAddress",
+      headerName: "StreetAddress",
+      width: 180,
+      editable: true,
+    },
+    {
+      field: "City",
+      headerName: "City",
+      width: 100,
+      editable: true,
+    },
+    {
+      field: "Pincode",
+      headerName: "Pincode",
+      type: "number",
+      width: 120,
+      editable: true,
+      renderCell: (params) => {
+        const value = params.value || 0;
+        return <span>{value}</span>;
+      },
+    },
+    {
+      field: "PlaceofSupply",
+      headerName: "PlaceofSupply",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "GSTN",
+      headerName: "GSTN",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "GSTIN",
+      headerName: "GSTIN",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "Particulars",
+      headerName: "Particulars",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "PSYear",
+      headerName: "PSYear",
+      width: 120,
+      editable: true,
+    },
     {
       field: "Items",
       headerName: "Items",
       width: 180,
+      editable: true,
+    },
+    {
+      field: "HSNSAC",
+      headerName: "HSNSAC",
+      type: "number",
+      width: 100,
+      editable: true,
+      renderCell: (params) => {
+        const value = params.value || 0;
+        return <span>{value}</span>;
+      },
+    },
+    {
+      field: "Rate",
+      headerName: "Rate",
+      type: "number",
+      width: 100,
       editable: true,
     },
     {
@@ -168,13 +239,6 @@ export default function Income2() {
         return new Date(dueDate);
       },
       min: { today },
-    },
-
-    {
-      field: "Prt",
-      headerName: "Prt",
-      width: 100,
-      editable: true,
     },
     {
       field: "Amount",
@@ -207,6 +271,13 @@ export default function Income2() {
     {
       field: "TotalAmount",
       headerName: "TotalAmount",
+      type: "number",
+      width: 100,
+      editable: true,
+    },
+    {
+      field: "BalanceDue",
+      headerName: "BalanceDue",
       type: "number",
       width: 100,
       editable: true,

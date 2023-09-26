@@ -6,6 +6,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
+
 import axios from "axios";
 import {
   GridRowModes,
@@ -13,9 +14,11 @@ import {
   GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
+  GridCellParams,
 } from "@mui/x-data-grid";
 import { randomCreatedDate, randomId } from "@mui/x-data-grid-generator";
 import { useEffect, useState, useRef } from "react";
+import ApiCalls from "../API/ApiCalls";
 let initialRows = [];
 
 function EditToolbar(props) {
@@ -27,19 +30,19 @@ function EditToolbar(props) {
       ...oldRows,
       {
         id,
-        From: "",
-        Items: "",
-        Prt: "",
+        Particulural: "",
+        DirectIndirect: "",
         CGST: "",
         SGST: "",
         Amount: "",
         Status: "",
+        TotalAmount: "",
         isNew: true,
       },
     ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+      [id]: { mode: GridRowModes.Edit, fieldToFocus: "Particulural" },
     }));
   };
 
@@ -57,7 +60,7 @@ function EditToolbar(props) {
   );
 }
 
-export default function Income2() {
+export default function ExpenseRecord() {
   const [rows, setRows] = useState(initialRows);
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
@@ -66,10 +69,11 @@ export default function Income2() {
 
   useEffect(() => {
     axios
-      .get(`/getincomedetails`)
+      .get(`/getexpensedetails`)
       .then((res) => setRows(res.data))
       .catch((err) => console.log(err));
   }, []);
+  console.log(rows);
 
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -106,9 +110,9 @@ export default function Income2() {
 
   const processRowUpdate = (newRow) => {
     const totalvalue =
-      (newRow.CGST / newRow.Amount) * 100 +
-      (newRow.SGST / newRow.Amount) * 100 +
-      (newRow.IGST / newRow.Amount) * 100 +
+      (newRow.CGST / 100) * newRow.Amount +
+      (newRow.SGST / 100) * newRow.Amount +
+      (newRow.IGST / 100) * newRow.Amount +
       newRow.Amount;
     const updatedRow = {
       ...newRow,
@@ -118,13 +122,13 @@ export default function Income2() {
     newRow.TotalAmount = totalvalue;
 
     if (actionTake) {
-      axios
-        .put(`/updateincome/${newRow.id}`, newRow)
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+      ApiCalls.updateExpense(newRow.id, newRow)
+        .then((res) => window.alert("Row Updated"))
+        .catch((err) => window.alert("Oops error occured"));
+      window.location.reload();
     } else {
       axios
-        .post("/addincome", newRow)
+        .post("/addexpense", newRow)
         .then((res) => console.log(res))
         .catch((err) => console.log(err));
       window.location.reload();
@@ -137,35 +141,16 @@ export default function Income2() {
   };
 
   const columns = [
-    { field: "From", headerName: "From", width: 120, editable: true },
     {
-      field: "Items",
-      headerName: "Items",
-      width: 180,
-      editable: true,
-    },
-    {
-      field: "DueDate",
-      headerName: "DueDate",
-      type: "date",
+      field: "Particulural",
+      headerName: "Particulural",
       width: 120,
-      align: "left",
-      headerAlign: "left",
       editable: true,
-      valueGetter: (params) => {
-        const dueDate = params.row.DueDate;
-        if (dueDate === null || dueDate === undefined) {
-          return null;
-        }
-        return new Date(dueDate);
-      },
-      min: { today },
     },
-
     {
-      field: "Prt",
-      headerName: "Prt",
-      width: 100,
+      field: "DirectIndirect",
+      headerName: "DirectIndirect",
+      width: 180,
       editable: true,
     },
     {
@@ -211,6 +196,24 @@ export default function Income2() {
       type: "singleSelect",
       valueOptions: ["Paid", "UnPaid", "Overdue"],
     },
+    {
+      field: "DueDate",
+      headerName: "DueDate",
+      type: "date",
+      width: 120,
+      align: "left",
+      headerAlign: "left",
+      editable: true,
+      valueGetter: (params) => {
+        const dueDate = params.row.DueDate;
+        if (dueDate === null || dueDate === undefined) {
+          return null;
+        }
+        return new Date(dueDate);
+      },
+      min: { today },
+    },
+
     {
       field: "ActionDate",
       headerName: "ActionDate",
