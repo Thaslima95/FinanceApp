@@ -35,6 +35,15 @@ export default {
       console.log(err);
     }
   },
+
+  deleteSingleIncome: async function (id) {
+    try {
+      const response = await axios.put(`/deletesinglerecord/${id}`);
+      return response.data;
+    } catch (err) {
+      console.log(err);
+    }
+  },
   getTotalExpense: async function () {
     try {
       const response = await axios.get(`/getTotalExpenseRate`);

@@ -6,19 +6,25 @@
     <title>Invoice</title>
 
     <style>
-         .rotated-hr {
+        .rotated-hr {
             width: 100%;
-            height: 2px; /* Adjust the height as needed */
-            background-color: black; /* Change the color as needed */
-            transform: rotate(90deg); /* Rotate the <hr> element by 90 degrees */
-            transform-origin: left center; /* Set the rotation origin to the left side */
+            height: 2px;
+            /* Adjust the height as needed */
+            background-color: black;
+            /* Change the color as needed */
+            transform: rotate(90deg);
+            /* Rotate the <hr> element by 90 degrees */
+            transform-origin: left center;
+            /* Set the rotation origin to the left side */
         }
-        table th{
+
+        table th {
             background: black;
-            color:white;
+            color: white;
             text-align: center;
-            border:"1px solid red"
+            border: "1px solid red"
         }
+
         .invoice-box {
             max-width: 800px;
             margin: auto;
@@ -28,63 +34,63 @@
             font-size: 14px;
             line-height: 20px;
             font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-            color:black;
-            
+            color: black;
+
         }
 
         .invoice-box table {
             width: 100%;
             line-height: inherit;
             text-align: left;
-            
+
         }
 
         .invoice-box table td {
             padding: 5px;
             vertical-align: top;
-           
+
         }
 
         .invoice-box table tr td:nth-child(2) {
             text-align: right;
-           
+
         }
 
         .invoice-box table tr.top table td {
             padding-bottom: 8px;
-            
-            
+
+
         }
 
         .invoice-box table tr.top table td.title {
             font-size: 45px;
             line-height: 25px;
             color: black;
-            
-            
+
+
         }
 
         .invoice-box table tr.information table td {
             padding-bottom: 8px;
-           
-            
+
+
         }
 
         .invoice-box table tr.heading td {
             background: #eee;
             border-bottom: 1px solid #ddd;
             font-weight: bold;
-            
+
         }
 
         .invoice-box table tr.details td {
             padding-bottom: 10px;
-            
+
         }
 
         .invoice-box table tr.item td {
             border-bottom: 1px solid #eee;
-            
+
         }
 
         .invoice-box table tr.item.last td {
@@ -94,7 +100,7 @@
         .invoice-box table tr.total td:nth-child(2) {
             border-top: 2px solid #eee;
             font-weight: bold;
-           
+
         }
 
         @media only screen and (max-width: 600px) {
@@ -128,11 +134,11 @@
 </head>
 
 <body>
-   
-   
-   
+
+
+
     <div class="invoice-box" style="border-left:1px solid black">
-        
+
         <table cellpadding="0" cellspacing="0">
             <tr class="top">
                 <td colspan="2">
@@ -144,10 +150,11 @@
                             </td>
 
                             <td>
-                                <br/>
-                                <span  style="font-size: 30px;">TAX INVOICE</span><br />
-                                <span>PS/<span id="psyear">${data[0].PSYear}</span><span id="invoiceid">/00${data[0].id}</span></span>
-<br />
+                                <br />
+                                <span style="font-size: 30px;">TAX INVOICE</span><br />
+                                <span>PS/<span id="psyear">${data[0].PSYear}</span><span
+                                        id="invoiceid">/00${data[0].id}</span></span>
+                                <br />
                             </td>
                         </tr>
                     </table>
@@ -159,18 +166,19 @@
                     <table>
                         <tr>
                             <td>
-                                <b>From</b><br/>
-                                <strong>Pyramidion Solutions Private Limited</strong> <br/>
-                                308, 3rd Floor, Akshaya HQ, Kazhipattur,<br/>
-                                Chennai - 603103 <br/>
-                                +91-7845914589 Email: accounts@pyramidions.com <br/>
+                                <b>From</b><br />
+                                <strong>Pyramidion Solutions Private Limited</strong> <br />
+                                308, 3rd Floor, Akshaya HQ, Kazhipattur,<br />
+                                Chennai - 603103 <br />
+                                +91-7845914589 Email: accounts@pyramidions.com <br />
                                 GSTN <span>33AAICP7896C1Z4</span>
                             </td>
 
                             <td>
                                 Balance Due<br />
-                                <strong><span id="balancedue" style="font-size: medium;">Rs.${data[0].TotalAmount}</span></strong><br />
-                                
+                                <strong><span id="balancedue"
+                                        style="font-size: medium;">Rs.${data[0].TotalAmount}</span></strong><br />
+
                             </td>
                         </tr>
                     </table>
@@ -181,97 +189,98 @@
                     <table>
                         <tr>
                             <td>
-                                <b>Bill To</b><br/>
+                                <b>Bill To</b><br />
                                 <strong><span id="companyname">${data[0].CompanyName}</span></strong><br />
                                 <span id="streetaddress">${data[0].StreetAddress}</span><br />
                                 <span id="city">${data[0].City}</span><br />
                                 <span id="state">TamilNadu</span> -<span id="pincode">${data[0].Pincode}</span><br />
                                 GSTIN <span id="gstin">${data[0].GSTIN}</span>
                             </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                             <td>
                                 <table>
-                                    <br/>
-                                    <br/>
-                                    <br/>
-                                    <br/>
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <br />
                                     <tr>
-                                        <td>Invoice Date: <br/>
-                                        
-                                        Terms:
-                                    <br/>
-                                
-                                Due Date:
-                            </td>
-                                        <td >
+                                        <td>Invoice Date: <br />
+
+                                            Terms:
+                                            <br />
+
+                                            Due Date:
+                                        </td>
+                                        <td>
                                             ${(new Date(data[0].CreatedAt)).toISOString().split("T")[0]}
-                                            <br/>
+                                            <br />
                                             <br />
                                             ${(new Date(data[0].DueDate)).toISOString().split("T")[0]}
 
                                         </td>
                                     </tr>
-                                  
+
                                 </table>
-        
-            
+
+
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
-<tr class="information">
-    <td colspan="2">
-        <table>
-            <tr>
-                <td>
-                    Shipt To <br />
-                    <br />
-                    Place Of Supply: <span id="placeofsupply">${data[0].PlaceofSupply}</span>
+            <tr class="information">
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td>
+                                Shipt To <br />
+                                <br />
+                                Place Of Supply: <span id="placeofsupply">${data[0].PlaceofSupply}</span>
 
-                </td>
+                            </td>
 
-    
-            </tr>
-        </table>
-    </td>
-</tr>
-<tr class="information">
-    <table style="border:1px solid black;border-collapse: collapse;">
-        <th style="border:1px solid black;color:black;">#</th>
-        <th style="border:1px solid black;color:black;" >Item & Description</th>
-        <th style="border:1px solid black;color:black;">HSN/SAC</th>
-        <th style="border:1px solid black;color:black;">Rate</th>
-        <th style="border:1px solid black;color:black;">CGST</th>
-        <th style="border:1px solid black;color:black;">SGST</th>
-        <th style="border:1px solid black;color:black;">IGST</th>
-        <th style="border:1px solid black;color:black;">Amount</th>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td style="text-align: center;">${data[0].Items}</td>
-                <td id="hsnsac">${data[0].HSNSAC}</td>
-                <td id="rate">${data[0].Rate}</td>
-                <td id="cgst">${Math.floor((data[0].CGST/100)*data[0].Amount)}<br>
-                    <span id="cgst">${data[0].CGST}</span><span>%</span></td>
-                <td id="sgst">${Math.floor((data[0].SGST/100)*data[0].Amount)} <br>
-                    <span id="sgst">${data[0].SGST}</span><span>%</span>
+
+                        </tr>
+                    </table>
                 </td>
-                <td id="igst">${Math.floor((data[0].IGST/100)*data[0].Amount)}<br>
-                    <span id="igst">${data[0].IGST}</span><span>%</span>
-                </td>
-                <td id="amount">${data[0].TotalAmount}</td>
             </tr>
-        </tbody>
-    </table>
-</tr>
+            <tr class="information">
+                <table style="border:1px solid black;border-collapse: collapse;">
+                    <th style="border:1px solid black;color:black;">#</th>
+                    <th style="border:1px solid black;color:black;">Item & Description</th>
+                    <th style="border:1px solid black;color:black;">HSN/SAC</th>
+                    <th style="border:1px solid black;color:black;">Rate</th>
+                    <th style="border:1px solid black;color:black;">CGST</th>
+                    <th style="border:1px solid black;color:black;">SGST</th>
+                    <th style="border:1px solid black;color:black;">IGST</th>
+                    <th style="border:1px solid black;color:black;">Amount</th>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td style="text-align: center;">${data[0].Items}</td>
+                            <td id="hsnsac">${data[0].HSNSAC}</td>
+                            <td id="rate">${data[0].Rate}</td>
+                            <td id="cgst">${Math.floor((data[0].CGST/100)*data[0].Amount)}<br>
+                                <span id="cgst">${data[0].CGST}</span><span>%</span>
+                            </td>
+                            <td id="sgst">${Math.floor((data[0].SGST/100)*data[0].Amount)} <br>
+                                <span id="sgst">${data[0].SGST}</span><span>%</span>
+                            </td>
+                            <td id="igst">${Math.floor((data[0].IGST/100)*data[0].Amount)}<br>
+                                <span id="igst">${data[0].IGST}</span><span>%</span>
+                            </td>
+                            <td id="amount">${data[0].TotalAmount}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </tr>
         </table>
     </div>
     <div class="invoice-box" style="border-left:1px solid black">
@@ -280,7 +289,24 @@
                 <td colspan="2">
                     <table>
                         <tr>
-                           <td ></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                            <td></td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -293,55 +319,40 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
-                            <td></td>
 
                             <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            
-                            <td></td>
-                           
-            
+
+
                             <td>
                                 <table>
-                                    
+
                                     <tr>
                                         <td>Sub Total <br />
-                                
+
                                             CGST <span>(</span><span id="cgst">${data[0].CGST}</span><span>%)</span>
                                             <br />
-                                
-                                            SGST<span>(</span><span id="sgst">${data[0].SGST}</span><span>%)</span><br/>
-                                            IGST<span>(</span><span id="igst">${data[0].IGST}</span><span>%)</span><br />
-                                            <strong>Total</strong> <br/>
-                                            <strong>Balance Due</strong> <br/>
+
+                                            SGST<span>(</span><span
+                                                id="sgst">${data[0].SGST}</span><span>%)</span><br />
+                                            IGST<span>(</span><span
+                                                id="igst">${data[0].IGST}</span><span>%)</span><br />
+                                            <strong>Total</strong> <br />
+                                            <strong>Balance Due</strong> <br />
                                         </td>
-                                        <td>${data[0].Rate} <br/>
-                                        ${Math.floor((data[0].CGST/100)*data[0].Amount)}<br/>
-                                        ${Math.floor((data[0].SGST/100)*data[0].Amount)} <br/>
-                                        ${Math.floor((data[0].IGST/100)*data[0].Amount)}<br />
-                                            <strong>${data[0].TotalAmount}</strong> <br/>
+                                        <td>${data[0].Rate} <br />
+                                            ${Math.floor((data[0].CGST/100)*data[0].Amount)}<br />
+                                            ${Math.floor((data[0].SGST/100)*data[0].Amount)} <br />
+                                            ${Math.floor((data[0].IGST/100)*data[0].Amount)}<br />
+                                            <strong>${data[0].TotalAmount}</strong> <br />
                                             <strong><span id="balancedue">${data[0].TotalAmount}</span></strong>
-                                <br/>
-                                
+                                            <br />
+
                                         </td>
                                     </tr>
-                                
+
                                 </table>
-                              
-            
+
+
                             </td>
                         </tr>
                     </table>
@@ -352,8 +363,8 @@
                     <table>
                         <tr>
                             <td>
-                               
-                                Notes <br/>
+
+                                Notes <br />
                                 Payment Info via Bank transfer <br />
                                 Bank Name: ICICI Bank Nugapakkam Branch Chennai <br />
                                 Beneficiary Name: Pyramidion Solutions Private Limited <br />
@@ -368,21 +379,21 @@
                     <table>
                         <tr>
                             <td>
-            
-                            Terms & Conditions <br/>
-                            Thanks for your business. <br/>
-                            
-                            <hr/>
-                            This is a system generated invoice and does not require signature
+
+                                Terms & Conditions <br />
+                                Thanks for your business. <br />
+
+                                <hr />
+                                This is a system generated invoice and does not require signature
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
-            </table>
-            </div>
-         
-          
+        </table>
+    </div>
+
+
 </body>
 
 

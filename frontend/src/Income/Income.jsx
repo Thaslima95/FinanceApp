@@ -1,11 +1,18 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import {
   GridRowModes,
@@ -14,10 +21,9 @@ import {
   GridActionsCellItem,
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
-import { randomCreatedDate, randomId } from "@mui/x-data-grid-generator";
-import { useEffect, useState, useRef } from "react";
+import { randomId } from "@mui/x-data-grid-generator";
+import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
-let initialRows = [];
 
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
@@ -59,11 +65,24 @@ function EditToolbar(props) {
 }
 
 export default function Income() {
-  const [rows, setRows] = useState(initialRows);
+  const [open, setOpen] = React.useState(false);
+  const theme = useTheme();
+  const [deleteid, setDeleteId] = useState(0);
+  const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
-
   const today = new Date().toISOString().split("T")[0];
+
+  const handleDelete = (id) => {
+    ApiCalls.deleteSingleIncome(id)
+      .then((res) => window.alert("deleted"))
+      .catch((err) => console.log(err));
+    setOpen(false);
+    window.location.reload();
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     axios
@@ -90,7 +109,8 @@ export default function Income() {
   };
 
   const handleDeleteClick = (id) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    setDeleteId(id);
+    setOpen(true);
   };
 
   const handleCancelClick = (id) => () => {
@@ -385,6 +405,29 @@ export default function Income() {
           toolbar: { setRows, setRowModesModel },
         }}
       />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure want to delete the record?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={{ color: "red" }}
+            autoFocus
+            onClick={() => handleDelete(deleteid)}
+          >
+            Yes
+          </Button>
+          <Button onClick={handleClose} autoFocus>
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

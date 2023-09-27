@@ -42,7 +42,7 @@ export default function IncomeDashboard() {
             <Typography
               sx={{ color: "green", fontSize: { md: "30px", xs: "1rem" } }}
             >
-              +{totalIncome}
+              {totalIncome ? `+${totalIncome}` : 0}
             </Typography>
           </Box>
         </Grid>

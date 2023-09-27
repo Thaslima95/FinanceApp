@@ -2,15 +2,26 @@ const express=require('express')
 const mysql=require('mysql')
 const cors=require('cors')
 var bodyParser = require('body-parser');
+const { v4: uuidv4 } = require('uuid');
 const app = express();
+
+
+const generatepdf = new(require('./sample'))()
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.use(express.json()) 
+console.log(generatepdf)
 
 
 app.use(cors())
+function generateShortRandomName() {
+  const uuid = uuidv4();
+  const shortName = uuid.replace(/-/g, '').substr(0, 10); // Adjust the length as needed
+  return shortName;
+}
 
 const db=mysql.createConnection({
     host:"localhost",
@@ -26,16 +37,18 @@ db.connect(function (err) {
 });
 
 const queryfunc=(sql,values)=>{
+    let id=0;
 db.query(sql,[values],(err,data)=>{
     if(err) throw err;
-    return (data)
+    console.log(data.insertId)
+     id=data.insertId;
 })
+return id;
 }
 
 
 
 app.post('/addincome',(req,res)=>{
-    console.log(req.body)
     const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
     const city=req.body.City;
@@ -59,11 +72,23 @@ app.post('/addincome',(req,res)=>{
     const details=req.body.Items;
     const sql="INSERT INTO income_table (CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate) VALUES ?";
     const value=[[companyname,streetaddress,city,pincode,placeofsupply,duedate,GSTN,GSTIN,particulars,psyear,hsnsac,rate,amount,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate]];
-    const result=queryfunc(sql,value)
-    return res.json(result)
+    db.query(sql,[value],(err,data)=>{
+    if(err) throw err;
+     let id=data.insertId;
+     req.body.id=id;
+     const randomFilename = generateShortRandomName() + '.pdf';
+    generatepdf.mypdf([req.body],randomFilename)
+    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
+    db.query(sql,(err,data)=>{
+        if(err) throw err;
+         return res.json({"message":"Record Inserted"})
+    })
+      
+})
+    
 })
 app.put('/updateincome/:id',(req,res)=>{
-    console.log(req.body)
+    
 const id=req.params.id;
 const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
@@ -94,7 +119,7 @@ db.query(sql,[companyname,streetaddress,city,pincode,placeofsupply,GSTN,GSTIN,pa
 })
 
 app.get('/getTotalIncomeRate',(req,res)=>{
-    const sql=`Select sum(TotalAmount) as Total from income_table where Status='Paid'`;
+    const sql=`Select sum(TotalAmount) as Total from income_table where Status='Paid' and IsDeleted=0`;
     db.query(sql,(err,data)=>{
         if(err) throw err;
         return res.json(data)
@@ -102,7 +127,7 @@ app.get('/getTotalIncomeRate',(req,res)=>{
 })
 
 app.get('/getUnpaidTotalIncomeRate',(req,res)=>{
-    const sql=`Select sum(TotalAmount) as Total from income_table where Status='UnPaid'`;
+    const sql=`Select sum(TotalAmount) as Total from income_table where Status='UnPaid' and IsDeleted=0`;
     db.query(sql,(err,data)=>{
         if(err) throw err;
         return res.json(data)
@@ -111,21 +136,31 @@ app.get('/getUnpaidTotalIncomeRate',(req,res)=>{
 
 
 app.get('/getincomedetails',(req,res)=>{
-    console.log("income")
-    const sql="Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table";
+   
+    const sql="Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table where IsDeleted=0";
     db.query(sql,(err,data)=>{
         if(err) throw err;
-        console.log(data)
+       
         return res.json(data)
     })
 })
 
 app.get('/getsingleincomedetails/:id',(req,res)=>{
+    
     const id=req.params.id;
     const sql=`Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,Status,Items,ActionDate,CreatedAt from income_table where id=${id}`;
     db.query(sql,(err,data)=>{
         if(err) throw err;
-        console.log(data)
+        
+        return res.json(data)
+    })
+})
+
+app.put('/deletesinglerecord/:id',(req,res)=>{
+    const id=req.params.id;
+    const sql=`UPDATE income_table SET IsDeleted=1 where id=${id}`
+    db.query(sql,(err,data)=>{
+        if(err) throw err;
         return res.json(data)
     })
 })
