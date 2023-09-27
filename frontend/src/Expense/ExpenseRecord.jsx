@@ -36,9 +36,9 @@ function EditToolbar(props) {
         Particulars: "",
         PaymentType: "",
         Amount: "",
-        CGST: "",
-        SGST: "",
-        IGST: "",
+        CGST: 0,
+        SGST: 0,
+        IGST: 0,
         TotalAmount: "",
         isNew: true,
       },
@@ -122,31 +122,41 @@ export default function ExpenseRecord() {
   };
 
   const processRowUpdate = (newRow) => {
-    const totalvalue =
-      (newRow.CGST / 100) * newRow.Amount +
-      (newRow.SGST / 100) * newRow.Amount +
-      (newRow.IGST / 100) * newRow.Amount +
-      newRow.Amount;
-    const updatedRow = {
-      ...newRow,
-      TotalAmount: totalvalue,
-      isNew: false,
-    };
-    newRow.TotalAmount = totalvalue;
-
-    if (actionTake) {
-      ApiCalls.updateExpense(newRow.id, newRow)
-        .then((res) => window.alert("Row Updated"))
-        .catch((err) => window.alert("Oops error occured"));
-      window.location.reload();
+    if (
+      newRow.InvoiceNumber == "" ||
+      newRow.Particulars == "" ||
+      newRow.Amount == null ||
+      newRow.PaymentType == "" ||
+      newRow.DueDate == null
+    ) {
+      alert(`Mandatory fields should not be empty`);
     } else {
-      axios
-        .post("/addexpense", newRow)
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
-      window.location.reload();
+      const totalvalue =
+        (newRow.CGST / 100) * newRow.Amount +
+        (newRow.SGST / 100) * newRow.Amount +
+        (newRow.IGST / 100) * newRow.Amount +
+        newRow.Amount;
+      const updatedRow = {
+        ...newRow,
+        TotalAmount: totalvalue,
+        isNew: false,
+      };
+      newRow.TotalAmount = totalvalue;
+
+      if (actionTake) {
+        ApiCalls.updateExpense(newRow.id, newRow)
+          .then((res) => window.alert("Row Updated"))
+          .catch((err) => window.alert("Oops error occured"));
+        window.location.reload();
+      } else {
+        axios
+          .post("/addexpense", newRow)
+          .then((res) => console.log(res))
+          .catch((err) => console.log(err));
+        window.location.reload();
+      }
+      return updatedRow;
     }
-    return updatedRow;
   };
 
   const handleRowModesModelChange = (newRowModesModel) => {
@@ -156,19 +166,34 @@ export default function ExpenseRecord() {
   const columns = [
     {
       field: "InvoiceNumber",
-      headerName: "Invoice Number",
+      headerName: (
+        <div>
+          <b>Invoice Number </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "Particulars",
-      headerName: "Particulars",
+      headerName: (
+        <div>
+          <b>Particulars </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "Amount",
-      headerName: "Amount",
+      headerName: (
+        <div>
+          <b>Amount </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "number",
       width: 80,
       editable: true,
@@ -200,18 +225,36 @@ export default function ExpenseRecord() {
       type: "number",
       width: 100,
       editable: true,
+      renderCell: (params) => {
+        const value = params.value || 0;
+        return (
+          <span>
+            <b>{value}</b>
+          </span>
+        );
+      },
     },
     {
       field: "PaymentType",
-      headerName: "PaymentType",
-      width: 100,
+      headerName: (
+        <div>
+          <b>Payment Type </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
+      width: 140,
       editable: true,
       type: "singleSelect",
       valueOptions: ["Direct", "Indirect"],
     },
     {
       field: "DueDate",
-      headerName: "DueDate",
+      headerName: (
+        <div>
+          <b>DueDate </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "date",
       width: 120,
       align: "left",
@@ -229,7 +272,12 @@ export default function ExpenseRecord() {
 
     {
       field: "ActionDate",
-      headerName: "ActionDate",
+      headerName: (
+        <div>
+          <b>ActionDate </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "date",
       width: 120,
       align: "left",

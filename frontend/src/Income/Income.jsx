@@ -46,9 +46,10 @@ function EditToolbar(props) {
         CompanyName: "",
         Items: "",
         PSYear: `${lastTwoDigitsCurrentYear}-${lastTwoDigitsNextYear}`,
-        CGST: "",
-        SGST: "",
-        Amount: "",
+        CGST: 0,
+        SGST: 0,
+        IGST: 0,
+
         Status: "",
         isNew: true,
       },
@@ -148,26 +149,25 @@ export default function Income() {
       newRow.Items == "" ||
       newRow.HSNSAC == "" ||
       newRow.Rate == null ||
-      newRow.Amount == null ||
+      newRow.DueDate == null ||
       newRow.Status == ""
     ) {
       alert(`Mandatory fields should not be empty`);
     } else {
       console.log(newRow);
       const totalvalue =
-        (newRow.CGST / 100) * newRow.Amount +
-        (newRow.SGST / 100) * newRow.Amount +
-        (newRow.IGST / 100) * newRow.Amount +
-        newRow.Amount;
+        (newRow.CGST / 100) * newRow.Rate +
+        (newRow.SGST / 100) * newRow.Rate +
+        (newRow.IGST / 100) * newRow.Rate +
+        newRow.Rate;
       const updatedRow = {
         ...newRow,
         TotalAmount: totalvalue,
-        BalanceDue: newRow.Amount,
+        BalanceDue: totalvalue,
         isNew: false,
       };
       newRow.TotalAmount = totalvalue;
-      newRow.BalanceDue = newRow.Amount;
-      console.log(newRow.CGST);
+      newRow.BalanceDue = totalvalue;
 
       if (actionTake) {
         ApiCalls.updateIncome(newRow.id, newRow)
@@ -344,17 +344,7 @@ export default function Income() {
       },
       min: { today },
     },
-    {
-      field: "Amount",
-      headerName: (
-        <div>
-          <b>Amount</b> <span style={{ color: "red" }}>*</span>
-        </div>
-      ),
-      type: "number",
-      width: 80,
-      editable: true,
-    },
+
     {
       field: "CGST",
       headerName: "CGST %",
@@ -382,6 +372,14 @@ export default function Income() {
       type: "number",
       width: 100,
       editable: true,
+      renderCell: (params) => {
+        const value = params.value || 0;
+        return (
+          <span>
+            <b>{value}</b>
+          </span>
+        );
+      },
     },
     {
       field: "BalanceDue",
@@ -401,6 +399,25 @@ export default function Income() {
       editable: true,
       type: "singleSelect",
       valueOptions: ["Paid", "UnPaid", "Overdue"],
+      renderCell: (params) => {
+        const value = params.value;
+        let color = "";
+        if (params.value == "UnPaid" || "Overdue") {
+          color = "red";
+        } else {
+          color = "";
+        }
+
+        return (
+          <span
+            style={{
+              color: (value == "UnPaid" || value == "Overdue") && "red",
+            }}
+          >
+            {value}
+          </span>
+        );
+      },
     },
     {
       field: "ActionDate",

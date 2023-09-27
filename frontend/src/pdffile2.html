@@ -211,7 +211,7 @@
                                 Due Date:
                             </td>
                                         <td >
-                                            ${(new Date(data[0].CreatedAt)).toISOString().split("T")[0]}
+                                            ${(new Date(data[0].ActionDate)).toISOString().split("T")[0]}
                                             <br/>
                                             <br />
                                             ${(new Date(data[0].DueDate)).toISOString().split("T")[0]}
@@ -259,12 +259,12 @@
                 <td style="text-align: center;">${data[0].Items}</td>
                 <td id="hsnsac">${data[0].HSNSAC}</td>
                 <td id="rate">${data[0].Rate}</td>
-                <td id="cgst">${Math.floor((data[0].CGST/100)*data[0].Amount)}<br>
+                <td id="cgst">${Math.floor((data[0].CGST/100)*data[0].Rate)}<br>
                     <span id="cgst">${data[0].CGST}</span><span>%</span></td>
-                <td id="sgst">${Math.floor((data[0].SGST/100)*data[0].Amount)} <br>
+                <td id="sgst">${Math.floor((data[0].SGST/100)*data[0].Rate)} <br>
                     <span id="sgst">${data[0].SGST}</span><span>%</span>
                 </td>
-                <td id="igst">${Math.floor((data[0].IGST/100)*data[0].Amount)}<br>
+                <td id="igst">${Math.floor((data[0].IGST/100)*data[0].Rate)}<br>
                     <span id="igst">${data[0].IGST}</span><span>%</span>
                 </td>
                 <td id="amount">${data[0].TotalAmount}</td>
@@ -329,9 +329,9 @@
                                             <strong>Balance Due</strong> <br/>
                                         </td>
                                         <td>${data[0].Rate} <br/>
-                                        ${Math.floor((data[0].CGST/100)*data[0].Amount)}<br/>
-                                        ${Math.floor((data[0].SGST/100)*data[0].Amount)} <br/>
-                                        ${Math.floor((data[0].IGST/100)*data[0].Amount)}<br />
+                                        ${Math.floor((data[0].CGST/100)*data[0].Rate)}<br/>
+                                        ${Math.floor((data[0].SGST/100)*data[0].Rate)} <br/>
+                                        ${Math.floor((data[0].IGST/100)*data[0].Rate)}<br />
                                             <strong>${data[0].TotalAmount}</strong> <br/>
                                             <strong><span id="balancedue">${data[0].TotalAmount}</span></strong>
                                 <br/>
