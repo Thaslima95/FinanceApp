@@ -18,7 +18,7 @@ app.use(express.json())
 app.use(cors())
 function generateShortRandomName() {
   const uuid = uuidv4();
-  const shortName = uuid.replace(/-/g, '').substr(0, 10); // Adjust the length as needed
+  const shortName = uuid.replace(/-/g, '').substr(0, 10);
   return shortName;
 }
 
