@@ -136,33 +136,52 @@ export default function Income() {
 
   const processRowUpdate = (newRow) => {
     console.log(newRow);
-    const totalvalue =
-      (newRow.CGST / 100) * newRow.Amount +
-      (newRow.SGST / 100) * newRow.Amount +
-      (newRow.IGST / 100) * newRow.Amount +
-      newRow.Amount;
-    const updatedRow = {
-      ...newRow,
-      TotalAmount: totalvalue,
-      BalanceDue: newRow.Amount,
-      isNew: false,
-    };
-    newRow.TotalAmount = totalvalue;
-    newRow.BalanceDue = newRow.Amount;
-    console.log(newRow.CGST);
-
-    if (actionTake) {
-      ApiCalls.updateIncome(newRow.id, newRow)
-        .then((res) => window.alert("record updated sucess"))
-        .catch((err) => window.alert("Oops! some error occured"));
-      window.location.reload();
+    if (
+      newRow.CompanyName == "" ||
+      newRow.StreetAddress == "" ||
+      newRow.City == "" ||
+      newRow.Pincode == null ||
+      newRow.PlaceofSupply == "" ||
+      newRow.GSTN == "" ||
+      newRow.GSTIN == "" ||
+      newRow.Particulars == "" ||
+      newRow.Items == "" ||
+      newRow.HSNSAC == "" ||
+      newRow.Rate == null ||
+      newRow.Amount == null ||
+      newRow.Status == ""
+    ) {
+      alert(`Mandatory fields should not be empty`);
     } else {
-      ApiCalls.addIncome(newRow)
-        .then((res) => window.alert("record added sucess"))
-        .catch((err) => window.alert("Oops! some error occured"));
-      window.location.reload();
+      console.log(newRow);
+      const totalvalue =
+        (newRow.CGST / 100) * newRow.Amount +
+        (newRow.SGST / 100) * newRow.Amount +
+        (newRow.IGST / 100) * newRow.Amount +
+        newRow.Amount;
+      const updatedRow = {
+        ...newRow,
+        TotalAmount: totalvalue,
+        BalanceDue: newRow.Amount,
+        isNew: false,
+      };
+      newRow.TotalAmount = totalvalue;
+      newRow.BalanceDue = newRow.Amount;
+      console.log(newRow.CGST);
+
+      if (actionTake) {
+        ApiCalls.updateIncome(newRow.id, newRow)
+          .then((res) => window.alert("record updated sucess"))
+          .catch((err) => window.alert("Oops! some error occured"));
+        window.location.reload();
+      } else {
+        ApiCalls.addIncome(newRow)
+          .then((res) => window.alert("record added sucess"))
+          .catch((err) => window.alert("Oops! some error occured"));
+        window.location.reload();
+      }
+      return updatedRow;
     }
-    return updatedRow;
   };
 
   const handleRowModesModelChange = (newRowModesModel) => {
@@ -172,25 +191,43 @@ export default function Income() {
   const columns = [
     {
       field: "CompanyName",
-      headerName: "CompanyName",
+      headerName: (
+        <div>
+          <b>CompanyName </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "StreetAddress",
-      headerName: "StreetAddress",
+      headerName: (
+        <div>
+          <b>StreetAddress</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 180,
       editable: true,
     },
     {
       field: "City",
-      headerName: "City",
+      headerName: (
+        <div>
+          <b>City </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 100,
       editable: true,
     },
     {
       field: "Pincode",
-      headerName: "Pincode",
+      headerName: (
+        <div>
+          <b>Pincode</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "number",
       width: 120,
       editable: true,
@@ -201,43 +238,71 @@ export default function Income() {
     },
     {
       field: "PlaceofSupply",
-      headerName: "PlaceofSupply",
+      headerName: (
+        <div>
+          <b>PlaceofSupply</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "GSTN",
-      headerName: "GSTN",
+      headerName: (
+        <div>
+          <b>GSTN</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "GSTIN",
-      headerName: "GSTIN",
+      headerName: (
+        <div>
+          <b>GSTIN</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "Particulars",
-      headerName: "Particulars",
+      headerName: (
+        <div>
+          <b>Particulars</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "PSYear",
-      headerName: "PSYear",
+      headerName: (
+        <div>
+          <b>PSYear</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 120,
       editable: true,
     },
     {
       field: "Items",
-      headerName: "Items",
+      headerName: (
+        <div>
+          <b>Items</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 180,
       editable: true,
     },
     {
       field: "HSNSAC",
-      headerName: "HSNSAC",
+      headerName: (
+        <div>
+          <b>HSNSAC</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "number",
       width: 100,
       editable: true,
@@ -248,14 +313,23 @@ export default function Income() {
     },
     {
       field: "Rate",
-      headerName: "Rate",
+      headerName: (
+        <div>
+          <b>Rate</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "number",
       width: 100,
       editable: true,
     },
     {
       field: "DueDate",
-      headerName: "DueDate",
+      headerName: (
+        <div>
+          <b>DueDate </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "date",
       width: 120,
       align: "left",
@@ -272,7 +346,11 @@ export default function Income() {
     },
     {
       field: "Amount",
-      headerName: "Amount",
+      headerName: (
+        <div>
+          <b>Amount</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       type: "number",
       width: 80,
       editable: true,
@@ -314,7 +392,11 @@ export default function Income() {
     },
     {
       field: "Status",
-      headerName: "Status",
+      headerName: (
+        <div>
+          <b>Status</b> <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
       width: 100,
       editable: true,
       type: "singleSelect",
