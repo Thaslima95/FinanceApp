@@ -35,12 +35,12 @@ export default function ExpenseDashboard() {
             }}
           >
             <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
-              Expense
+              Direct Expense
             </Typography>
             <Typography
               sx={{ color: "red", fontSize: { md: "30px", xs: "1rem" } }}
             >
-              -{totalExpense}
+              {totalExpense && `-${totalExpense}`}
             </Typography>
           </Box>
         </Grid>
@@ -55,12 +55,12 @@ export default function ExpenseDashboard() {
             }}
           >
             <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
-              Expense Outstanding
+              Indirect expense
             </Typography>
             <Typography
               sx={{ color: "red", fontSize: { md: "30px", xs: "1rem" } }}
             >
-              {unpaidExpense}
+              {unpaidExpense && `-${unpaidExpense}`}
             </Typography>
           </Box>
         </Grid>

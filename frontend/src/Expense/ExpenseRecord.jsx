@@ -6,6 +6,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
 
 import axios from "axios";
 import {
@@ -14,12 +18,10 @@ import {
   GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
-  GridCellParams,
 } from "@mui/x-data-grid";
-import { randomCreatedDate, randomId } from "@mui/x-data-grid-generator";
-import { useEffect, useState, useRef } from "react";
+import { randomId } from "@mui/x-data-grid-generator";
+import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
-let initialRows = [];
 
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
@@ -30,12 +32,13 @@ function EditToolbar(props) {
       ...oldRows,
       {
         id,
-        Particulural: "",
-        DirectIndirect: "",
+        InvoiceNumber: "",
+        Particulars: "",
+        PaymentType: "",
+        Amount: "",
         CGST: "",
         SGST: "",
-        Amount: "",
-        Status: "",
+        IGST: "",
         TotalAmount: "",
         isNew: true,
       },
@@ -61,11 +64,23 @@ function EditToolbar(props) {
 }
 
 export default function ExpenseRecord() {
-  const [rows, setRows] = useState(initialRows);
+  const [open, setOpen] = React.useState(false);
+  const [deleteid, setDeleteId] = useState(0);
+  const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
+  const handleDelete = (id) => {
+    ApiCalls.deleteSingleExpense(id)
+      .then((res) => window.alert("deleted"))
+      .catch((err) => console.log(err));
+    setOpen(false);
+    window.location.reload();
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     axios
@@ -73,7 +88,6 @@ export default function ExpenseRecord() {
       .then((res) => setRows(res.data))
       .catch((err) => console.log(err));
   }, []);
-  console.log(rows);
 
   const handleRowEditStop = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -87,13 +101,12 @@ export default function ExpenseRecord() {
   };
 
   const handleSaveClick = (id) => () => {
-    console.log(rowModesModel);
-    console.log(id);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
   const handleDeleteClick = (id) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    setDeleteId(id);
+    setOpen(true);
   };
 
   const handleCancelClick = (id) => () => {
@@ -142,15 +155,15 @@ export default function ExpenseRecord() {
 
   const columns = [
     {
-      field: "Particulural",
-      headerName: "Particulural",
+      field: "InvoiceNumber",
+      headerName: "Invoice Number",
       width: 120,
       editable: true,
     },
     {
-      field: "DirectIndirect",
-      headerName: "DirectIndirect",
-      width: 180,
+      field: "Particulars",
+      headerName: "Particulars",
+      width: 120,
       editable: true,
     },
     {
@@ -189,12 +202,12 @@ export default function ExpenseRecord() {
       editable: true,
     },
     {
-      field: "Status",
-      headerName: "Status",
+      field: "PaymentType",
+      headerName: "PaymentType",
       width: 100,
       editable: true,
       type: "singleSelect",
-      valueOptions: ["Paid", "UnPaid", "Overdue"],
+      valueOptions: ["Direct", "Indirect"],
     },
     {
       field: "DueDate",
@@ -225,7 +238,7 @@ export default function ExpenseRecord() {
       valueGetter: (params) => {
         const actionDate = params.row.ActionDate;
         if (actionDate === null || actionDate === undefined) {
-          return null;
+          return new Date();
         }
         return new Date(actionDate);
       },
@@ -309,6 +322,29 @@ export default function ExpenseRecord() {
           toolbar: { setRows, setRowModesModel },
         }}
       />
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure want to delete the record?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={{ color: "red" }}
+            autoFocus
+            onClick={() => handleDelete(deleteid)}
+          >
+            Yes
+          </Button>
+          <Button onClick={handleClose} autoFocus>
+            No
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

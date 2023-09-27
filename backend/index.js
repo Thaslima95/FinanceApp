@@ -36,13 +36,11 @@ db.connect(function (err) {
 });
 
 const queryfunc=(sql,values)=>{
-    let id=0;
 db.query(sql,[values],(err,data)=>{
     if(err) throw err;
-    console.log(data.insertId)
-     id=data.insertId;
+    return data;
 })
-return id;
+
 }
 
 
@@ -173,61 +171,69 @@ app.put('/deletesinglerecord/:id',(req,res)=>{
 
 
 app.post('/addexpense',(req,res)=>{
-    console.log(req.body)
-    const particulural=req.body.Particulural;
+    
+    const invoicenumber=req.body.InvoiceNumber;
+    const particulars=req.body.Particulars;
     const duedate = req.body.DueDate!=null ? new Date(req.body.DueDate).toISOString().slice(0, 19).replace('T', ' '):null;
     const actiondate =req.body.ActionDate!=null ? new Date(req.body.ActionDate).toISOString().slice(0, 19).replace('T', ' '):null; 
-    const didt=req.body.DirectIndirect;
+    const paymentType=req.body.PaymentType;
     const amount=req.body.Amount;
     const cgst=req.body.CGST;
     const sgst=req.body.SGST;
     const igst=req.body.IGST;
     const totalamount=req.body.TotalAmount;
-    const status=req.body.Status;
-    
-    
-    const sql="INSERT INTO expense_table (Particulural,DirectIndirect,Amount,CGST,SGST,IGST,TotalAmount,`Status`,DueDate,ActionDate) VALUES ?";
-    const value=[[particulural,didt,amount,cgst,sgst,igst,totalamount,status,duedate,actiondate]];
+    const sql="INSERT INTO expense_table (InvoiceNumber,Particulars,PaymentType,Amount,CGST,SGST,IGST,TotalAmount,DueDate,ActionDate) VALUES ?";
+    const value=[[invoicenumber,particulars,paymentType,amount,cgst,sgst,igst,totalamount,duedate,actiondate]];
     const result=queryfunc(sql,value)
+   
     return res.json(result)
 })
 app.put('/updateexpense/:id',(req,res)=>{
 const id=req.params.id;
-  const particulural=req.body.Particulural;
+  const invoicenumber=req.body.InvoiceNumber;
+    const particulars=req.body.Particulars;
     const duedate = req.body.DueDate!=null ? new Date(req.body.DueDate).toISOString().slice(0, 19).replace('T', ' '):null;
     const actiondate =req.body.ActionDate!=null ? new Date(req.body.ActionDate).toISOString().slice(0, 19).replace('T', ' '):null; 
-    const didt=req.body.DirectIndirect;
+    const paymentType=req.body.PaymentType;
     const amount=req.body.Amount;
     const cgst=req.body.CGST;
     const sgst=req.body.SGST;
     const igst=req.body.IGST;
     const totalamount=req.body.TotalAmount;
-    const status=req.body.Status;
-const sql="UPDATE expense_table SET Particulural=?,DueDate=?,DirectIndirect=?,Amount=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,`Status`=?,ActionDate=? where id=?";
-db.query(sql,[particulural,duedate,didt,amount,cgst,sgst,igst,totalamount,status,actiondate,id],(err,data)=>{
+const sql="UPDATE expense_table SET InvoiceNumber=?,Particulars=?,DueDate=?,PaymentType=?,Amount=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,ActionDate=? where id=?";
+db.query(sql,[invoicenumber,particulars,duedate,paymentType,amount,cgst,sgst,igst,totalamount,actiondate,id],(err,data)=>{
     if(err) throw err;
     return res.json(data)
 })
 })
 
 
-app.get('/getTotalExpenseRate',(req,res)=>{
-    const sql="Select sum(TotalAmount) as Total from expense_table";
+app.get('/getDirectTotalExpenseRate',(req,res)=>{
+    const sql="Select sum(TotalAmount) as Total from expense_table where PaymentType='Direct' and IsDeleted=0";
     db.query(sql,(err,data)=>{
         if(err) throw err;
         return res.json(data)
     })
 })
 
-app.get('/getTotalUnpaidExpenseRate',(req,res)=>{
-    const sql=`Select sum(TotalAmount) as Total from expense_table where Status='UnPaid'`;
+app.get('/getIndirectTotalExpenseRate',(req,res)=>{
+    const sql=`Select sum(TotalAmount) as Total from expense_table where PaymentType='Indirect' and IsDeleted=0`;
     db.query(sql,(err,data)=>{
         if(err) throw err;
         return res.json(data)
     })
 })
 app.get('/getexpensedetails',(req,res)=>{
-    const sql="SELECT id,CGST,Particulural,DirectIndirect,Amount,SGST,IGST,TotalAmount,`Status`,DueDate,ActionDate from expense_table";
+    const sql="SELECT id,InvoiceNumber,CGST,Particulars,PaymentType,Amount,SGST,IGST,TotalAmount,DueDate,ActionDate from expense_table where  IsDeleted=0";
+    db.query(sql,(err,data)=>{
+        if(err) throw err;
+        return res.json(data)
+    })
+})
+
+app.put('/deletesingleexpenserecord/:id',(req,res)=>{
+    const id=req.params.id;
+    const sql=`UPDATE expense_table SET IsDeleted=1 where id=${id}`
     db.query(sql,(err,data)=>{
         if(err) throw err;
         return res.json(data)

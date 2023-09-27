@@ -46,7 +46,7 @@ export default {
   },
   getTotalExpense: async function () {
     try {
-      const response = await axios.get(`/getTotalExpenseRate`);
+      const response = await axios.get(`/getDirectTotalExpenseRate`);
       return response.data;
     } catch (err) {
       console.log(err);
@@ -54,7 +54,7 @@ export default {
   },
   getUnpaidTotalExpense: async function () {
     try {
-      const response = await axios.get(`/getTotalUnpaidExpenseRate`);
+      const response = await axios.get(`/getIndirectTotalExpenseRate`);
       return response.data;
     } catch (err) {
       console.log(err);
@@ -72,6 +72,14 @@ export default {
     try {
       const response = await axios.put(`/updateexpense/${id}`, newRow);
       console.log(response.data);
+      return response.data;
+    } catch (err) {
+      console.log(err);
+    }
+  },
+  deleteSingleExpense: async function (id) {
+    try {
+      const response = await axios.put(`/deletesingleexpenserecord/${id}`);
       return response.data;
     } catch (err) {
       console.log(err);

@@ -10,9 +10,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import {
   GridRowModes,
@@ -34,9 +31,9 @@ function EditToolbar(props) {
       ...oldRows,
       {
         id,
-        From: "",
+        CompanyName: "",
         Items: "",
-        Prt: "",
+
         CGST: "",
         SGST: "",
         Amount: "",
@@ -66,7 +63,7 @@ function EditToolbar(props) {
 
 export default function Income() {
   const [open, setOpen] = React.useState(false);
-  const theme = useTheme();
+
   const [deleteid, setDeleteId] = useState(0);
   const [rows, setRows] = useState([]);
   const [rowModesModel, setRowModesModel] = useState({});

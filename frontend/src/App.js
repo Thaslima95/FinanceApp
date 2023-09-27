@@ -6,7 +6,7 @@ import ExpenseDashboard from './Expense/ExpenseDashboard'
 
 function App() {
   return (
-    <IncomeDashboard/>
+    <ExpenseDashboard/>
   );
 }
 
