@@ -13,7 +13,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.use(express.json()) 
-console.log(generatepdf)
 
 
 app.use(cors())
@@ -114,7 +113,14 @@ const companyname=req.body.CompanyName;
 const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,Amount=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
 db.query(sql,[companyname,streetaddress,city,pincode,placeofsupply,GSTN,GSTIN,particulars,psyear,hsnsac,rate,duedate,amount,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
     if(err) throw err;
-    return res.json(data)
+     const randomFilename = generateShortRandomName() + '.pdf';
+    generatepdf.mypdf([req.body],randomFilename)
+    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
+    db.query(sql,(err,data)=>{
+        if(err) throw err;
+         return res.json({"message":"Updated Sucess"})
+    })
+   
 })
 })
 
