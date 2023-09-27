@@ -37,8 +37,11 @@ db.connect(function (err) {
 
 const queryfunc=(sql,values)=>{
 db.query(sql,[values],(err,data)=>{
-    if(err) throw err;
-    return data;
+    if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+    return res.status(200).json({ data });
 })
 
 }
@@ -46,6 +49,7 @@ db.query(sql,[values],(err,data)=>{
 
 
 app.post('/addincome',(req,res)=>{
+    console.log(req.body)
     const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
     const city=req.body.City;
@@ -70,15 +74,21 @@ app.post('/addincome',(req,res)=>{
     const sql="INSERT INTO income_table (CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate) VALUES ?";
     const value=[[companyname,streetaddress,city,pincode,placeofsupply,duedate,GSTN,GSTIN,particulars,psyear,hsnsac,rate,amount,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate]];
     db.query(sql,[value],(err,data)=>{
-    if(err) throw err;
+     if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
      let id=data.insertId;
      req.body.id=id;
      const randomFilename = generateShortRandomName() + '.pdf';
     generatepdf.mypdf([req.body],randomFilename)
     const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
     db.query(sql,(err,data)=>{
-        if(err) throw err;
-         return res.json({"message":"Record Inserted"})
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+         return res.status(200).json({"message":"Record Inserted"})
     })
       
 })
@@ -110,13 +120,22 @@ const companyname=req.body.CompanyName;
     const details=req.body.Items;
 const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,Amount=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
 db.query(sql,[companyname,streetaddress,city,pincode,placeofsupply,GSTN,GSTIN,particulars,psyear,hsnsac,rate,duedate,amount,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
-    if(err) throw err;
+     if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
      const randomFilename = generateShortRandomName() + '.pdf';
     generatepdf.mypdf([req.body],randomFilename)
     const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
     db.query(sql,(err,data)=>{
-        if(err) throw err;
-         return res.json({"message":"Updated Sucess"})
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+          if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Record not updated" });
+    }
+    res.json({ message: "Record updated successfully" });
     })
    
 })
@@ -125,7 +144,10 @@ db.query(sql,[companyname,streetaddress,city,pincode,placeofsupply,GSTN,GSTIN,pa
 app.get('/getTotalIncomeRate',(req,res)=>{
     const sql=`Select sum(TotalAmount) as Total from income_table where Status='Paid' and IsDeleted=0`;
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
         return res.json(data)
     })
 })
@@ -133,7 +155,10 @@ app.get('/getTotalIncomeRate',(req,res)=>{
 app.get('/getUnpaidTotalIncomeRate',(req,res)=>{
     const sql=`Select sum(TotalAmount) as Total from income_table where Status='UnPaid' and IsDeleted=0`;
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
         return res.json(data)
     })
 })
@@ -143,7 +168,10 @@ app.get('/getincomedetails',(req,res)=>{
    
     const sql="Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table where IsDeleted=0";
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
        
         return res.json(data)
     })
@@ -154,7 +182,10 @@ app.get('/getsingleincomedetails/:id',(req,res)=>{
     const id=req.params.id;
     const sql=`Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,Amount,CGST,SGST,IGST,TotalAmount,BalanceDue,Status,Items,ActionDate,CreatedAt from income_table where id=${id}`;
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
         
         return res.json(data)
     })
@@ -164,8 +195,15 @@ app.put('/deletesinglerecord/:id',(req,res)=>{
     const id=req.params.id;
     const sql=`UPDATE income_table SET IsDeleted=1 where id=${id}`
     db.query(sql,(err,data)=>{
-        if(err) throw err;
-        return res.json(data)
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Record not found" });
+    }
+    res.json({ message: "Record deleted successfully" });
+        
     })
 })
 
@@ -184,9 +222,16 @@ app.post('/addexpense',(req,res)=>{
     const totalamount=req.body.TotalAmount;
     const sql="INSERT INTO expense_table (InvoiceNumber,Particulars,PaymentType,Amount,CGST,SGST,IGST,TotalAmount,DueDate,ActionDate) VALUES ?";
     const value=[[invoicenumber,particulars,paymentType,amount,cgst,sgst,igst,totalamount,duedate,actiondate]];
-    const result=queryfunc(sql,value)
+ db.query(sql,[value],(err,data)=>{
+     if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+    
+    return res.status(200).json({"message":"Record Inserted"})
+ })
    
-    return res.json(result)
+    
 })
 app.put('/updateexpense/:id',(req,res)=>{
 const id=req.params.id;
@@ -202,8 +247,14 @@ const id=req.params.id;
     const totalamount=req.body.TotalAmount;
 const sql="UPDATE expense_table SET InvoiceNumber=?,Particulars=?,DueDate=?,PaymentType=?,Amount=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,ActionDate=? where id=?";
 db.query(sql,[invoicenumber,particulars,duedate,paymentType,amount,cgst,sgst,igst,totalamount,actiondate,id],(err,data)=>{
-    if(err) throw err;
-    return res.json(data)
+    if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+       if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Record not updated" });
+    }
+    res.json({ message: "Record updated successfully" });
 })
 })
 
@@ -211,7 +262,10 @@ db.query(sql,[invoicenumber,particulars,duedate,paymentType,amount,cgst,sgst,igs
 app.get('/getDirectTotalExpenseRate',(req,res)=>{
     const sql="Select sum(TotalAmount) as Total from expense_table where PaymentType='Direct' and IsDeleted=0";
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+        if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
         return res.json(data)
     })
 })
@@ -219,14 +273,20 @@ app.get('/getDirectTotalExpenseRate',(req,res)=>{
 app.get('/getIndirectTotalExpenseRate',(req,res)=>{
     const sql=`Select sum(TotalAmount) as Total from expense_table where PaymentType='Indirect' and IsDeleted=0`;
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+        if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
         return res.json(data)
     })
 })
 app.get('/getexpensedetails',(req,res)=>{
     const sql="SELECT id,InvoiceNumber,CGST,Particulars,PaymentType,Amount,SGST,IGST,TotalAmount,DueDate,ActionDate from expense_table where  IsDeleted=0";
     db.query(sql,(err,data)=>{
-        if(err) throw err;
+        if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
         return res.json(data)
     })
 })
@@ -235,8 +295,15 @@ app.put('/deletesingleexpenserecord/:id',(req,res)=>{
     const id=req.params.id;
     const sql=`UPDATE expense_table SET IsDeleted=1 where id=${id}`
     db.query(sql,(err,data)=>{
-        if(err) throw err;
-        return res.json(data)
+        if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+    if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Record not found" });
+    }
+    res.json({ message: "Record deleted successfully" });
+        
     })
 })
 

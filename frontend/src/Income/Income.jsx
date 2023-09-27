@@ -21,6 +21,18 @@ import {
 import { randomId } from "@mui/x-data-grid-generator";
 import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
+const currentYear = new Date().getFullYear();
+
+// Calculate the next year
+const nextYear = currentYear + 1;
+
+console.log("Current Year: " + currentYear);
+console.log("Next Year: " + nextYear);
+const lastTwoDigitsCurrentYear = currentYear % 100;
+const lastTwoDigitsNextYear = nextYear % 100;
+
+console.log("Last two digits of current year: " + lastTwoDigitsCurrentYear);
+console.log("Last two digits of next year: " + lastTwoDigitsNextYear);
 
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;
@@ -33,7 +45,7 @@ function EditToolbar(props) {
         id,
         CompanyName: "",
         Items: "",
-
+        PSYear: `${lastTwoDigitsCurrentYear}-${lastTwoDigitsNextYear}`,
         CGST: "",
         SGST: "",
         Amount: "",
@@ -137,6 +149,7 @@ export default function Income() {
     };
     newRow.TotalAmount = totalvalue;
     newRow.BalanceDue = newRow.Amount;
+    console.log(newRow.CGST);
 
     if (actionTake) {
       ApiCalls.updateIncome(newRow.id, newRow)
@@ -318,7 +331,7 @@ export default function Income() {
       valueGetter: (params) => {
         const actionDate = params.row.ActionDate;
         if (actionDate === null || actionDate === undefined) {
-          return null;
+          return new Date();
         }
         return new Date(actionDate);
       },
