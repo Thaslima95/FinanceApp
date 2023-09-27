@@ -1,12 +1,14 @@
 import logo from './logo.svg';
 import './App.css';
-import IncomeDashboard from './Income/IncomeDashboard';
-import ExpenseDashboard from './Expense/ExpenseDashboard'
+import { BrowserRouter } from 'react-router-dom';
+import RoutesFile from './Routes/RoutesFile';
 
 
 function App() {
   return (
-    <ExpenseDashboard/>
+    <BrowserRouter>
+<RoutesFile/>
+    </BrowserRouter>
   );
 }
 
