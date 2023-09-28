@@ -146,7 +146,7 @@ export default function ExpenseRecord() {
       if (actionTake) {
         ApiCalls.updateExpense(newRow.id, newRow)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status == 200 || 201) {
               window.alert("Record Updated Successfully");
               window.location.reload();
             }
@@ -157,7 +157,7 @@ export default function ExpenseRecord() {
         axios
           .post("/addexpense", newRow)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status == 200 || 201) {
               window.alert("Record Inserted Successfully");
               window.location.reload();
             }
