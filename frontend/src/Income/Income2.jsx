@@ -34,7 +34,7 @@ import {
 import { randomId } from "@mui/x-data-grid-generator";
 import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
-import Popup2 from "./Popup2";
+
 const currentYear = new Date().getFullYear();
 
 const nextYear = currentYear + 1;
@@ -156,7 +156,7 @@ export default function Income2() {
     console.log(updaterow);
     setOpen(true);
     // return <Popup2 open={open} setOpen={setOpen} />;
-    // setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
   const handleSaveClick = (id) => () => {

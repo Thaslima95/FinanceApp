@@ -97,12 +97,7 @@ export default function Popup2(open, setOpen) {
     setOpen(true);
   };
   return (
-    <Dialog
-      fullWidth={fullWidth}
-      maxWidth="md"
-      open={open}
-      onClose={handleClose}
-    >
+    <>
       <DialogContent fullWidth>
         <DialogContentText sx={{ fontWeight: 800 }}>
           Add Income Details
@@ -431,6 +426,6 @@ export default function Popup2(open, setOpen) {
           Cancel
         </Button>
       </DialogActions>
-    </Dialog>
+    </>
   );
 }
