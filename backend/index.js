@@ -121,7 +121,7 @@ db.query(sql,[companyname,streetaddress,city,pincode,placeofsupply,GSTN,GSTIN,pa
           if (data.affectedRows === 0) {
       return res.status(404).json({ error: "Record not updated" });
     }
-    res.json({ message: "Record updated successfully" });
+    res.status(200).json({status:200, message: "Record updated successfully" });
     })
    
 })
@@ -240,7 +240,7 @@ db.query(sql,[invoicenumber,particulars,duedate,paymentType,amount,cgst,sgst,igs
        if (data.affectedRows === 0) {
       return res.status(404).json({ error: "Record not updated" });
     }
-    res.json({ message: "Record updated successfully" });
+    res.status(200).json({ message: "Record updated successfully" });
 })
 })
 

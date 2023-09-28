@@ -13,8 +13,7 @@ export default {
   updateIncome: async function (id, newRow) {
     try {
       const response = await axios.put(`/updateincome/${id}`, newRow);
-      console.log(response.data);
-      return response.data;
+      return response;
     } catch (err) {
       console.log(err);
     }
@@ -63,7 +62,7 @@ export default {
   addExpense: async function (newRow) {
     try {
       const response = await axios.post(`/addexpense`, newRow);
-      return response.data;
+      return response;
     } catch (err) {
       console.log(err);
     }
@@ -71,8 +70,7 @@ export default {
   updateExpense: async function (id, newRow) {
     try {
       const response = await axios.put(`/updateexpense/${id}`, newRow);
-      console.log(response.data);
-      return response.data;
+      return response;
     } catch (err) {
       console.log(err);
     }

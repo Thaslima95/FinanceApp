@@ -145,15 +145,24 @@ export default function ExpenseRecord() {
 
       if (actionTake) {
         ApiCalls.updateExpense(newRow.id, newRow)
-          .then((res) => window.alert("Row Updated"))
+          .then((res) => {
+            if (res.status == 200) {
+              window.alert("Record Updated Successfully");
+              window.location.reload();
+            }
+          })
           .catch((err) => window.alert("Oops error occured"));
         window.location.reload();
       } else {
         axios
           .post("/addexpense", newRow)
-          .then((res) => console.log(res))
+          .then((res) => {
+            if (res.status == 200) {
+              window.alert("Record Inserted Successfully");
+              window.location.reload();
+            }
+          })
           .catch((err) => console.log(err));
-        window.location.reload();
       }
       return updatedRow;
     }

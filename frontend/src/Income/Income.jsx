@@ -106,8 +106,6 @@ export default function Income() {
   };
 
   const handleSaveClick = (id) => () => {
-    console.log(rowModesModel);
-    console.log(id);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
@@ -129,7 +127,6 @@ export default function Income() {
   };
 
   const processRowUpdate = (newRow) => {
-    console.log(newRow);
     if (
       newRow.CompanyName == "" ||
       newRow.StreetAddress == "" ||
@@ -147,7 +144,6 @@ export default function Income() {
     ) {
       alert(`Mandatory fields should not be empty`);
     } else {
-      console.log(newRow);
       const totalvalue =
         (newRow.CGST / 100) * newRow.Rate +
         (newRow.SGST / 100) * newRow.Rate +
@@ -164,14 +160,22 @@ export default function Income() {
 
       if (actionTake) {
         ApiCalls.updateIncome(newRow.id, newRow)
-          .then((res) => window.alert("record updated sucess"))
+          .then((res) => {
+            if (res.status == 200) {
+              window.alert("Record Update Sucess");
+              window.location.reload();
+            }
+          })
           .catch((err) => window.alert("Oops! some error occured"));
-        window.location.reload();
       } else {
         ApiCalls.addIncome(newRow)
-          .then((res) => window.alert("record added sucess"))
+          .then((res) => {
+            if (res.status == 200) {
+              window.alert("Record Inserted Successfully");
+              window.location.reload();
+            }
+          })
           .catch((err) => window.alert("Oops! some error occured"));
-        window.location.reload();
       }
       return updatedRow;
     }
