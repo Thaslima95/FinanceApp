@@ -197,7 +197,7 @@
                     <br/>
                 <span style="color:gray">Amount Received <br/>in
                 Words</span> </td>
-                                        <td style="text-align:left"><span><b>${data[0].ActionDate}</b></span>
+                                        <td style="text-align:left"><span><b>${(new Date(data[0].ActionDate)).toISOString().split("T")[0]}</b></span>
                                         <br />
                                         <br />
                                         <br />
@@ -209,8 +209,7 @@
                                              Bank Transfer</b></span>
                                         <br />
                                         <br />
-                                        <span> <b>Amount Received <br />in
-                                            Words </b></span></td>
+                                        <span> <b>${words}</b></span></td>
                                     </tr>
                                 </table>
                             </td>
@@ -221,7 +220,7 @@
     align-items: center;
     text-align: center;background: #c2e4f2;"><div>
                                     <span>Amount Received</span> <br>
-                                    <div><strong style="font-size:23px">Rs. 3,200.40</strong></div>
+                                    <div><strong style="font-size:23px">${data[0].TotalAmount}</strong></div>
                                     </div>
                                 </div>
 
@@ -274,14 +273,14 @@
                     <tbody>
                         <tr>
                             <td style="text-align: center;">iCom-2023-24-084</td>
-                            <td style="text-align: center;">18-05-2023 </td>
-                            <td id="hsnsac"></td>
-                            <td id="rate"></td>
+                            <td style="text-align: center;">${(new Date(data[0].ActionDate)).toISOString().split("T")[0]} </td>
+                            <td ></td>
+                            <td ></td>
                             <td></td>
-                            <td style="text-align: center;">Rs 3,200.40
+                            <td style="text-align: center;">Rs ${data[0].TotalAmount}
                                
                             </td>
-                            <td style="text-align: center;">Rs 3,200.40</td>
+                            <td style="text-align: center;">Rs ${data[0].TotalAmount}</td>
                         </tr>
                     </tbody>
                 </table>

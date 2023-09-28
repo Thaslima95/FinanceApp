@@ -7,6 +7,7 @@ const app = express();
 
 
 const generatepdf = new(require('./sample'))()
+const generatepdf2 = new(require('./sample2'))()
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -34,6 +35,42 @@ db.connect(function (err) {
   if (err) throw err;
   console.log("Connected!");
 });
+
+function numberToWords(number) {
+    const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    const teens = ['', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+    const tens = ['', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+    const thousands = ['', 'thousand', 'million', 'billion', 'trillion'];
+
+    function convertChunk(num) {
+        if (num === 0) {
+            return '';
+        } else if (num < 10) {
+            return ones[num];
+        } else if (num < 20) {
+            return teens[num - 10];
+        } else {
+            return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? ' ' + ones[num % 10] : '');
+        }
+    }
+
+    if (number === 0) {
+        return 'zero';
+    }
+
+    let result = '';
+    let chunkCount = 0;
+    while (number > 0) {
+        const chunk = number % 1000;
+        if (chunk > 0) {
+            result = convertChunk(chunk) + ' ' + thousands[chunkCount] + ' ' + result;
+        }
+        number = Math.floor(number / 1000);
+        chunkCount++;
+    }
+
+    return result.trim();
+}
 
 
 app.post('/addincome',(req,res)=>{
@@ -85,6 +122,7 @@ app.post('/addincome',(req,res)=>{
 app.put('/updateincome/:id',(req,res)=>{
     
 const id=req.params.id;
+
 const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
     const city=req.body.City;
@@ -106,7 +144,44 @@ const companyname=req.body.CompanyName;
     const balancedue=req.body.BalanceDue;
     const status=req.body.Status;
     const details=req.body.Items;
-const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,State=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
+    const sql=`Select Status from income_table where id=${id}`;
+    db.query(sql,(err,data)=>{
+      if(err)
+      {
+         console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+      }
+      const oldStatus=data[0].Status;
+      console.log(oldStatus)
+      if(req.body.Status=='Paid' && oldStatus=='UnPaid')
+      {
+        console.log("secondpdf")
+        const sql=`Update income_table SET Status='Paid' where id=${id}`;
+        db.query(sql,(err,data)=>{
+             if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+    const words=numberToWords(req.body.TotalAmount)
+    const randomFilename = generateShortRandomName() + '.pdf';
+    generatepdf2.mypdf2([req.body],words,randomFilename)
+    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
+    db.query(sql,(err,data)=>{
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+          if (data.affectedRows === 0) {
+      return res.status(404).json({ error: "Record not updated" });
+    }
+    res.status(200).json({status:200, message: "Record updated successfully" });
+    })
+
+
+        })
+      }
+      else{
+        const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,State=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
 db.query(sql,[companyname,streetaddress,city,state,pincode,placeofsupply,GSTN,GSTIN,particulars,psyear,hsnsac,rate,duedate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
      if(err){
         console.error("Error executing query: " + err.stack);
@@ -127,6 +202,10 @@ db.query(sql,[companyname,streetaddress,city,state,pincode,placeofsupply,GSTN,GS
     })
    
 })
+
+      }
+    })
+
 })
 
 app.get('/getTotalIncomeRate',(req,res)=>{
