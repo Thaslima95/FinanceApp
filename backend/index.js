@@ -37,21 +37,26 @@ db.connect(function (err) {
 });
 
 function numberToWords(number) {
-    const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    const units = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
     const teens = ['', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
     const tens = ['', 'ten', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-    const thousands = ['', 'thousand', 'million', 'billion', 'trillion'];
 
-    function convertChunk(num) {
-        if (num === 0) {
-            return '';
-        } else if (num < 10) {
-            return ones[num];
-        } else if (num < 20) {
-            return teens[num - 10];
-        } else {
-            return tens[Math.floor(num / 10)] + (num % 10 !== 0 ? ' ' + ones[num % 10] : '');
+    function convertChunk(chunk) {
+        let words = '';
+        if (chunk >= 100) {
+            words += units[Math.floor(chunk / 100)] + ' hundred ';
+            chunk %= 100;
         }
+        if (chunk >= 11 && chunk <= 19) {
+            words += teens[chunk - 11] + ' ';
+        } else if (chunk >= 10) {
+            words += tens[Math.floor(chunk / 10)] + ' ';
+            chunk %= 10;
+        }
+        if (chunk >= 1) {
+            words += units[chunk] + ' ';
+        }
+        return words;
     }
 
     if (number === 0) {
@@ -63,7 +68,7 @@ function numberToWords(number) {
     while (number > 0) {
         const chunk = number % 1000;
         if (chunk > 0) {
-            result = convertChunk(chunk) + ' ' + thousands[chunkCount] + ' ' + result;
+            result = convertChunk(chunk) + ['', 'thousand', 'million', 'billion'][chunkCount] + ' ' + result;
         }
         number = Math.floor(number / 1000);
         chunkCount++;
@@ -152,17 +157,16 @@ const companyname=req.body.CompanyName;
       return res.status(500).json({ error: "Database error" });
       }
       const oldStatus=data[0].Status;
-      console.log(oldStatus)
       if(req.body.Status=='Paid' && oldStatus=='UnPaid')
       {
-        console.log("secondpdf")
+        
         const sql=`Update income_table SET Status='Paid' where id=${id}`;
         db.query(sql,(err,data)=>{
              if(err){
         console.error("Error executing query: " + err.stack);
       return res.status(500).json({ error: "Database error" });
     }
-    const words=numberToWords(req.body.TotalAmount)
+    const words=numberToWords(req.body.TotalAmount)+" "+"only";
     const randomFilename = generateShortRandomName() + '.pdf';
     generatepdf2.mypdf2([req.body],words,randomFilename)
     const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`

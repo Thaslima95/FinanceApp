@@ -26,7 +26,7 @@ const html=`<!doctypehtml><meta charset="utf-8"><title>Invoice</title><style>.ro
   // or a .pdf file
   await page.pdf({
     format: 'A4',
-    path: `D:/Invoice${randomFilename}`
+    path: `D:/Invoice${data[0].id}(${(new Date(data[0].ActionDate)).toISOString().split("T")[0]})${randomFilename}`
   })
 
   // close the browser

@@ -6,6 +6,9 @@
   height: 40vmin;
   pointer-events: none;
 }
+.red-asterisk label.MuiInputLabel-asterisk {
+  color: red;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
