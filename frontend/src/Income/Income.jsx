@@ -23,16 +23,9 @@ import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
 const currentYear = new Date().getFullYear();
 
-// Calculate the next year
 const nextYear = currentYear + 1;
-
-console.log("Current Year: " + currentYear);
-console.log("Next Year: " + nextYear);
 const lastTwoDigitsCurrentYear = currentYear % 100;
 const lastTwoDigitsNextYear = nextYear % 100;
-
-console.log("Last two digits of current year: " + lastTwoDigitsCurrentYear);
-console.log("Last two digits of next year: " + lastTwoDigitsNextYear);
 
 function EditToolbar(props) {
   const { setRows, setRowModesModel } = props;

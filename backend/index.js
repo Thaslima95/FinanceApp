@@ -35,18 +35,6 @@ db.connect(function (err) {
   console.log("Connected!");
 });
 
-const queryfunc=(sql,values)=>{
-db.query(sql,[values],(err,data)=>{
-    if(err){
-        console.error("Error executing query: " + err.stack);
-      return res.status(500).json({ error: "Database error" });
-    }
-    return res.status(200).json({ data });
-})
-
-}
-
-
 
 app.post('/addincome',(req,res)=>{
     console.log(req.body)
@@ -63,7 +51,6 @@ app.post('/addincome',(req,res)=>{
     const duedate = req.body.DueDate!=null ? new Date(req.body.DueDate).toISOString().slice(0, 19).replace('T', ' '):null;
     const actiondate =req.body.ActionDate!=null ? new Date(req.body.ActionDate).toISOString().slice(0, 19).replace('T', ' '):null; 
     const rate=req.body.Rate;
-   
     const cgst=req.body.CGST;
     const sgst=req.body.SGST;
     const igst=req.body.IGST;
@@ -110,7 +97,6 @@ const companyname=req.body.CompanyName;
     const duedate = req.body.DueDate!=null ? new Date(req.body.DueDate).toISOString().slice(0, 19).replace('T', ' '):null;
     const actiondate =req.body.ActionDate!=null ? new Date(req.body.ActionDate).toISOString().slice(0, 19).replace('T', ' '):null; 
     const rate=req.body.Rate;
-    
     const cgst=req.body.CGST;
     const sgst=req.body.SGST;
     const igst=req.body.IGST;
