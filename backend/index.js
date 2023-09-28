@@ -41,6 +41,7 @@ app.post('/addincome',(req,res)=>{
     const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
     const city=req.body.City;
+    const state=req.body.State;
     const pincode=req.body.Pincode;
     const placeofsupply=req.body.PlaceofSupply;
     const particulars=req.body.Particulars;
@@ -58,8 +59,8 @@ app.post('/addincome',(req,res)=>{
     const balancedue=req.body.BalanceDue;
     const status=req.body.Status;
     const details=req.body.Items;
-    const sql="INSERT INTO income_table (CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate) VALUES ?";
-    const value=[[companyname,streetaddress,city,pincode,placeofsupply,duedate,GSTN,GSTIN,particulars,psyear,hsnsac,rate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate]];
+    const sql="INSERT INTO income_table (CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate) VALUES ?";
+    const value=[[companyname,streetaddress,city,state,pincode,placeofsupply,duedate,GSTN,GSTIN,particulars,psyear,hsnsac,rate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate]];
     db.query(sql,[value],(err,data)=>{
      if(err){
         console.error("Error executing query: " + err.stack);
@@ -88,6 +89,7 @@ const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
     const city=req.body.City;
     const pincode=req.body.Pincode;
+    const state=req.body.State;
     const placeofsupply=req.body.PlaceofSupply;
     const particulars=req.body.Particulars;
     const psyear=req.body.PSYear;
@@ -104,8 +106,8 @@ const companyname=req.body.CompanyName;
     const balancedue=req.body.BalanceDue;
     const status=req.body.Status;
     const details=req.body.Items;
-const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
-db.query(sql,[companyname,streetaddress,city,pincode,placeofsupply,GSTN,GSTIN,particulars,psyear,hsnsac,rate,duedate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
+const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,State=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
+db.query(sql,[companyname,streetaddress,city,state,pincode,placeofsupply,GSTN,GSTIN,particulars,psyear,hsnsac,rate,duedate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
      if(err){
         console.error("Error executing query: " + err.stack);
       return res.status(500).json({ error: "Database error" });
@@ -152,7 +154,7 @@ app.get('/getUnpaidTotalIncomeRate',(req,res)=>{
 
 app.get('/getincomedetails',(req,res)=>{
    
-    const sql="Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table where IsDeleted=0";
+    const sql="Select id,CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table where IsDeleted=0";
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);
@@ -166,7 +168,7 @@ app.get('/getincomedetails',(req,res)=>{
 app.get('/getsingleincomedetails/:id',(req,res)=>{
     
     const id=req.params.id;
-    const sql=`Select id,CompanyName,StreetAddress,City,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,Status,Items,ActionDate,CreatedAt from income_table where id=${id}`;
+    const sql=`Select id,CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,Status,Items,ActionDate,CreatedAt from income_table where id=${id}`;
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);

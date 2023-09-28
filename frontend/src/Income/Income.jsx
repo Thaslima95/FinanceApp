@@ -131,6 +131,7 @@ export default function Income() {
       newRow.CompanyName == "" ||
       newRow.StreetAddress == "" ||
       newRow.City == "" ||
+      newRow.State == "" ||
       newRow.Pincode == null ||
       newRow.PlaceofSupply == "" ||
       newRow.GSTN == "" ||
@@ -161,7 +162,7 @@ export default function Income() {
       if (actionTake) {
         ApiCalls.updateIncome(newRow.id, newRow)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status == 200 || 201) {
               window.alert("Record Update Sucess");
               window.location.reload();
             }
@@ -170,7 +171,7 @@ export default function Income() {
       } else {
         ApiCalls.addIncome(newRow)
           .then((res) => {
-            if (res.status == 200) {
+            if (res.status == 200 || 201) {
               window.alert("Record Inserted Successfully");
               window.location.reload();
             }
@@ -218,6 +219,18 @@ export default function Income() {
       width: 100,
       editable: true,
     },
+    {
+      field: "State",
+      headerName: (
+        <div>
+          <b>State </b>
+          <span style={{ color: "red" }}>*</span>
+        </div>
+      ),
+      width: 100,
+      editable: true,
+    },
+
     {
       field: "Pincode",
       headerName: (
