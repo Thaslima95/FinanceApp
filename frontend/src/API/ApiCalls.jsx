@@ -77,6 +77,8 @@ export default {
   },
   updateExpense: async function (id, newRow) {
     try {
+      console.log(newRow.DueDate);
+      console.log("updateExpense");
       const response = await axios.put(`/updateexpense/${id}`, newRow);
       return response;
     } catch (err) {

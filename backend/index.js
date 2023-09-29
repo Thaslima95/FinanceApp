@@ -311,6 +311,8 @@ app.post('/addexpense',(req,res)=>{
     
 })
 app.put('/updateexpense/:id',(req,res)=>{
+  console.log("update")
+  console.log(req.body)
 const id=req.params.id;
   const invoicenumber=req.body.InvoiceNumber;
     const particulars=req.body.Particulars;

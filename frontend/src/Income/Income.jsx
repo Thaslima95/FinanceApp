@@ -6,7 +6,8 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import DownloadIcon from "@mui/icons-material/Download";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-
+import Moment from "react-moment";
+import moment from "moment";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Button from "@mui/material/Button";
@@ -104,10 +105,13 @@ export default function Income2() {
         BalanceDue: total,
       });
       if (actionTake) {
+        console.log(typeof adddetails.DueDate);
         ApiCalls.updateIncome(adddetails.id, {
           ...adddetails,
           TotalAmount: total,
           BalanceDue: total,
+          // DueDate: adddetails.DueDate.add(1, "days"),
+          // ActionDate: adddetails.ActionDate.add(1, "days"),
         })
           .then((res) => {
             if (res.status == 200 || 201) {
@@ -121,6 +125,8 @@ export default function Income2() {
           ...adddetails,
           TotalAmount: total,
           BalanceDue: total,
+          DueDate: adddetails.DueDate.add(1, "days"),
+          ActionDate: adddetails.ActionDate.add(1, "days"),
         })
           .then((res) => {
             if (res.status == 200 || 201) {
@@ -696,7 +702,13 @@ export default function Income2() {
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label={<span>Due Date</span>}
+                  label={
+                    <span>
+                      {actionTake
+                        ? moment(adddetails.DueDate).format("YYYY-MM-DD")
+                        : "Due Date"}
+                    </span>
+                  }
                   sx={{ m: 1, width: 200 }}
                   onChange={(e) =>
                     setAddDetails({
@@ -777,7 +789,11 @@ export default function Income2() {
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label={<span>Action Date</span>}
+                  label={
+                    <span>
+                      {moment(adddetails.ActionDate).format("YYYY-MM-DD")}
+                    </span>
+                  }
                   sx={{ m: 1, width: 200 }}
                   onChange={(e) =>
                     setAddDetails({
@@ -785,7 +801,6 @@ export default function Income2() {
                       ActionDate: e,
                     })
                   }
-                  // value={adddetails.ActionDate}
                 />
               </LocalizationProvider>
             </Grid>

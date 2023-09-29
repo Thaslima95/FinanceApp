@@ -7,6 +7,8 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
+import Moment from "react-moment";
+import moment from "moment";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -92,10 +94,18 @@ export default function ExpenseRecord() {
         BalanceDue: total,
       });
       if (actionTake) {
+        console.log("due date update" + adddetails.DueDate);
+        console.log(typeof adddetails.DueDate);
+        const duedate = new Date(adddetails.DueDate);
+        const actiondate = new Date(adddetails.ActionDate);
         ApiCalls.updateExpense(adddetails.id, {
           ...adddetails,
           TotalAmount: total,
           BalanceDue: total,
+          // DueDate: duedate.setDate(duedate.getDate() + 1),
+          // Actiondate: actiondate.setDate(actiondate.getDate() + 1),
+          // DueDate: adddetails.DueDate.add(1, "days"),
+          // ActionDate: adddetails.ActionDate.add(1, "days"),
         })
           .then((res) => {
             if (res.status == 200 || 201) {
@@ -105,10 +115,15 @@ export default function ExpenseRecord() {
           })
           .catch((err) => window.alert("Sorry!Try Again"));
       } else {
+        console.log("add api");
+        console.log(typeof adddetails.DueDate);
+        console.log(adddetails.DueDate + "add due date");
         ApiCalls.addExpense({
           ...adddetails,
           TotalAmount: total,
           BalanceDue: total,
+          DueDate: adddetails.DueDate.add(1, "days"),
+          ActionDate: adddetails.ActionDate.add(1, "days"),
         })
           .then((res) => {
             if (res.status == 200 || 201) {
@@ -295,6 +310,7 @@ export default function ExpenseRecord() {
       headerAlign: "left",
       editable: true,
       valueGetter: (params) => {
+        console.log(params.row.duedate + "due date");
         const dueDate = params.row.DueDate;
         if (dueDate === null || dueDate === undefined) {
           return null;
@@ -510,7 +526,13 @@ export default function ExpenseRecord() {
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label={<span>Due Date</span>}
+                  label={
+                    <span>
+                      {actionTake
+                        ? moment(adddetails.DueDate).format("YYYY-MM-DD")
+                        : "Due Date"}
+                    </span>
+                  }
                   sx={{ m: 1, width: 200, marginTop: "10px" }}
                   onChange={(e) =>
                     setAddDetails({
@@ -553,7 +575,13 @@ export default function ExpenseRecord() {
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label={<span>Action Date</span>}
+                  label={
+                    <span>
+                      {actionTake
+                        ? moment(adddetails.ActionDate).format("YYYY-MM-DD")
+                        : "Action Date"}
+                    </span>
+                  }
                   sx={{ m: 1, width: 200 }}
                   onChange={(e) =>
                     setAddDetails({
@@ -561,7 +589,7 @@ export default function ExpenseRecord() {
                       ActionDate: e,
                     })
                   }
-                  // value={adddetails.ActionDate}
+                  // value={moment(adddetails.ActionDate).format("YYYY-MM-DD")}
                 />
               </LocalizationProvider>
             </Grid>
