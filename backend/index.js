@@ -109,9 +109,7 @@ app.post('/addincome',(req,res)=>{
     }
      let id=data.insertId;
      req.body.id=id;
-     const randomFilename = generateShortRandomName() + '.pdf';
-    generatepdf.mypdf([req.body],randomFilename)
-    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}',InvoiceNumber='PS/${psyear}/00${id}' where id=${id}`
+    const sql=`UPDATE income_table SET InvoiceNumber='PS/${psyear}/00${id}' where id=${id}`
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);
@@ -124,8 +122,9 @@ app.post('/addincome',(req,res)=>{
     
 })
 app.put('/updateincome/:id',(req,res)=>{
-    
+    console.log(req.params.id)
 const id=req.params.id;
+console.log(req.body.ActionDate)
 
 const companyname=req.body.CompanyName;
     const streetaddress=req.body.StreetAddress;
@@ -148,7 +147,7 @@ const companyname=req.body.CompanyName;
     const balancedue=req.body.BalanceDue;
     const status=req.body.Status;
     const details=req.body.Items;
-    const sql=`Select Status from income_table where id=${id}`;
+    const sql=`Select InvoiceNumber,Status from income_table where id=${id}`;
     db.query(sql,(err,data)=>{
       if(err)
       {
@@ -168,7 +167,7 @@ const companyname=req.body.CompanyName;
     const words=numberToWords(req.body.TotalAmount)+" "+"only";
     const randomFilename = generateShortRandomName() + '.pdf';
     generatepdf2.mypdf2([req.body],words,randomFilename)
-    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
+    const sql=`UPDATE income_table SET PaymentReceiptFile='PaymentReceipt${id}(${(new Date(req.body.ActionDate)).toISOString().split("T")[0]})${randomFilename}' where id=${id}`
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);

@@ -218,7 +218,7 @@
                                 <div style="width:150px;height:150px;margin:0 auto;text-align: center;display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;background:red;"><div>
+    text-align: center;background:#ccf5ff;"><div>
                                     <span>Amount Received</span> <br>
                                     <div><strong style="font-size:23px">${data[0].TotalAmount}</strong></div>
                                     </div>
@@ -272,7 +272,7 @@
                     <th style="border:1px solid black;color:gray;">Payment Amount</th>
                     <tbody>
                         <tr>
-                            <td style="text-align: center;">iCom-2023-24-084</td>
+                            <td style="text-align: center;">${data[0].InvoiceNumber}</td>
                             <td style="text-align: center;">${(new Date(data[0].ActionDate)).toISOString().split("T")[0]} </td>
                             <td ></td>
                             <td ></td>
