@@ -3,18 +3,18 @@ import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import DownloadIcon from "@mui/icons-material/Download";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
-import DialogTitle from "@mui/material/DialogTitle";
+
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Button from "@mui/material/Button";
 import FormControl from "@mui/material/FormControl";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
-import Switch from "@mui/material/Switch";
+
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -27,11 +27,9 @@ import axios from "axios";
 import {
   GridRowModes,
   DataGrid,
-  GridToolbarContainer,
   GridActionsCellItem,
   GridRowEditStopReasons,
 } from "@mui/x-data-grid";
-import { randomId } from "@mui/x-data-grid-generator";
 import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
 const currentYear = new Date().getFullYear();
@@ -41,27 +39,24 @@ const lastTwoDigitsNextYear = nextYear % 100;
 
 export default function Income2() {
   const [open, setOpen] = React.useState(false);
+  const [deleteopen, setdeleteOpen] = React.useState(false);
   const [fullWidth, setFullWidth] = React.useState(true);
-  const [maxWidth, setMaxWidth] = React.useState("sm");
   const [deleteid, setDeleteId] = useState(0);
-  const [updaterow, setUpdateRow] = useState({});
   const [rows, setRows] = useState([]);
-  const [editrow, setEditRow] = useState({});
-  let updatedrow = [];
 
-  updatedrow = JSON.parse(localStorage.getItem("row")) || [];
+  let updatedrow = [];
 
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
   const [paymentreceipt, setPaymentReceipt] = useState(false);
   const [adddetails, setAddDetails] = useState({
+    InvoiceNumber: "",
     CompanyName: "",
     StreetAddress: "",
     City: "",
     Pincode: "",
     State: "",
     PlaceofSupply: "",
-    GSTIN: "A56Af",
     Particulars: "",
     PSYear: "23-24",
     Items: "",
@@ -73,14 +68,13 @@ export default function Income2() {
     Status: "",
     DueDate: "",
     ActionDate: "",
-    GSTN: "",
+    GSTIN: "",
     TotalAmount: 0,
     BalanceDue: 0,
   });
   const today = new Date().toISOString().split("T")[0];
-  console.log(adddetails);
-  console.log(rows);
-  const handleDelete = (id) => {
+
+  const handleaddIncome = () => {
     if (
       adddetails.CompanyName == "" ||
       adddetails.StreetAddress == "" ||
@@ -88,7 +82,7 @@ export default function Income2() {
       adddetails.State == "" ||
       adddetails.Pincode == null ||
       adddetails.PlaceofSupply == "" ||
-      adddetails.GSTN == "" ||
+      adddetails.GSTIN == "" ||
       adddetails.Particulars == "" ||
       adddetails.Items == "" ||
       adddetails.HSNSAC == "" ||
@@ -117,11 +111,11 @@ export default function Income2() {
         })
           .then((res) => {
             if (res.status == 200 || 201) {
-              window.alert("Record Update Sucess");
+              window.alert("Income Updated Successfully");
               window.location.reload();
             }
           })
-          .catch((err) => window.alert("Oops! some error occured"));
+          .catch((err) => window.alert("Sorry!Try Again"));
       } else {
         ApiCalls.addIncome({
           ...adddetails,
@@ -130,18 +124,21 @@ export default function Income2() {
         })
           .then((res) => {
             if (res.status == 200 || 201) {
-              window.alert("Record Inserted Successfully");
+              window.alert("Income Created Successfully");
               window.location.reload();
             }
           })
-          .catch((err) => window.alert("Oops! some error occured"));
+          .catch((err) => window.alert("Sorry!Try Again"));
       }
     }
   };
 
   const handleClose = () => {
-    console.log("close");
     setOpen(false);
+    window.location.reload();
+  };
+  const handleDeleteClose = () => {
+    setdeleteOpen(false);
     window.location.reload();
   };
   const handleClick = () => {
@@ -155,26 +152,48 @@ export default function Income2() {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleRowEditStop = (params, event) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
-  };
-
   const handleEditClick = (id) => {
     setActionTake(true);
     setOpen(true);
     updatedrow = rows.filter((e) => e.id == id);
-    setAddDetails(updatedrow[0]);
+    console.log(updatedrow[0].ActionDate);
+    console.log(new Date(updatedrow[0].ActionDate).toISOString().split("T")[0]);
+    setAddDetails({
+      ...updatedrow[0],
+      DueDate: new Date(updatedrow[0].DueDate).toISOString().split("T")[0],
+      ActionDate: new Date(updatedrow[0].ActionDate)
+        .toISOString()
+        .split("T")[0],
+    });
   };
 
   const handleSaveClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
-  const handleDeleteClick = (id) => () => {
+  const handleDeleteClick = (id) => {
     setDeleteId(id);
-    // setOpen(true);
+    setdeleteOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    ApiCalls.deleteSingleIncome(id)
+      .then((res) => {
+        if (res.status == 300 || 301) {
+          window.alert("Income deleted");
+          window.location.reload();
+        }
+      })
+      .catch((err) => window.alert("Sorry!Try Again"));
+  };
+  const handleDownloadClick = (id) => {
+    ApiCalls.donwloadInvoice(id)
+      .then((res) => {
+        if (res.status == 200 || 201) {
+          window.alert("Download success");
+        }
+      })
+      .catch((err) => console.log("error"));
   };
 
   const handleCancelClick = (id) => () => {
@@ -190,6 +209,17 @@ export default function Income2() {
   };
 
   const columns = [
+    {
+      field: "InvoiceNumber",
+      headerName: (
+        <div>
+          <b>Invoice Number </b>
+        </div>
+      ),
+      width: 140,
+      editable: true,
+      headerClassName: "super-app-theme--header",
+    },
     {
       field: "CompanyName",
       headerName: (
@@ -344,7 +374,7 @@ export default function Income2() {
         if (params.value == "Paid") {
           setPaymentReceipt(true);
         }
-        let color = "";
+        let color = "green";
         if (params.value == "UnPaid" || "Overdue" || "Declined") {
           color = "red";
         } else {
@@ -355,10 +385,9 @@ export default function Income2() {
           <span
             style={{
               color:
-                (value == "UnPaid" ||
-                  value == "Overdue" ||
-                  value == "Declined") &&
-                "red",
+                value == "UnPaid" || value == "Overdue" || value == "Declined"
+                  ? "red"
+                  : "green",
             }}
           >
             {value}
@@ -428,11 +457,19 @@ export default function Income2() {
             onClick={() => handleEditClick(id)}
           />,
           <GridActionsCellItem
-            icon={<DeleteIcon sx={{ color: "secondary" }} />}
+            icon={<DeleteIcon sx={{ color: "#676767" }} />}
             label="Delete"
-            onClick={handleDeleteClick(id)}
+            onClick={() => handleDeleteClick(id)}
             sx={{
-              color: "secondary.main",
+              color: "#676767",
+            }}
+          />,
+          <GridActionsCellItem
+            icon={<DownloadIcon sx={{ color: "#676767" }} />}
+            label="Delete"
+            onClick={() => handleDownloadClick(id)}
+            sx={{
+              color: "#676767",
             }}
           />,
         ];
@@ -452,19 +489,17 @@ export default function Income2() {
           color: "text.primary",
         },
         "& .super-app-theme--header": {
-          backgroundColor: "#9c27b0",
+          backgroundColor: "#676767",
           color: "white",
           fontSize: "17px",
-          // borderRadius: "5px",
         },
       }}
     >
       <Button
-        color="secondary"
+        sx={{ background: "#FBC91B", marginBottom: "50px" }}
         variant="contained"
         startIcon={<AddIcon />}
         onClick={handleClick}
-        sx={{ marginBottom: "50px" }}
       >
         Add record
       </Button>
@@ -474,9 +509,6 @@ export default function Income2() {
         columns={columns}
         editMode="row"
         rowModesModel={rowModesModel}
-        // onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        // processRowUpdate={processRowUpdate}
         slotProps={{
           toolbar: { setRows, setRowModesModel },
         }}
@@ -528,16 +560,16 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={<span>GSTN</span>}
+                label={<span>GSTIN</span>}
                 variant="filled"
                 sx={{ marginBottom: "20px" }}
                 onChange={(e) =>
                   setAddDetails({
                     ...adddetails,
-                    GSTN: e.target.value,
+                    GSTIN: e.target.value,
                   })
                 }
-                value={adddetails.GSTN}
+                value={adddetails.GSTIN}
               />
               <TextField
                 id="filled-basic"
@@ -753,11 +785,7 @@ export default function Income2() {
                       ActionDate: e,
                     })
                   }
-                  value={
-                    adddetails.ActionDate
-                      ? new AdapterDayjs(adddetails.ActionDate)
-                      : null
-                  }
+                  // value={adddetails.ActionDate}
                 />
               </LocalizationProvider>
             </Grid>
@@ -766,14 +794,37 @@ export default function Income2() {
         <DialogActions>
           <Button
             autoFocus
-            color="secondary"
+            sx={{ background: "#FBC91B" }}
             variant="contained"
-            onClick={() => handleDelete(deleteid)}
+            onClick={() => handleaddIncome()}
           >
             {actionTake ? "UPDATE" : "ADD"}
           </Button>
           <Button onClick={handleClose} autoFocus>
             Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={deleteopen}
+        onClose={handleDeleteClose}
+        aria-labelledby="responsive-dialog-title"
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure want to delete the record?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            sx={{ color: "red" }}
+            autoFocus
+            onClick={() => handleDelete(deleteid)}
+          >
+            Yes
+          </Button>
+          <Button onClick={handleDeleteClose} autoFocus>
+            No
           </Button>
         </DialogActions>
       </Dialog>

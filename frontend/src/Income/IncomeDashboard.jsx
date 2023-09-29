@@ -26,14 +26,15 @@ export default function IncomeDashboard() {
   return (
     <Grid container>
       <Grid container xs>
-        <Grid item xl={2} md={3} xs={4}>
+        <Grid item xl={3} md={3} xs={5}>
           <Box
             sx={{
+              marginTop: "20px",
               borderRadius: "25px",
               display: { xs: "block", md: "block" },
               height: "150px",
               paddingLeft: "20px",
-              background: "#ba68c8",
+              background: "#676767",
               color: "white",
               marginLeft: "50px",
             }}
@@ -46,27 +47,28 @@ export default function IncomeDashboard() {
             </Typography>
           </Box>
         </Grid>
-        <Grid item xl={1} xs={2} md={2}></Grid>
         <Grid item xl={3} md={3} xs={4}>
-          <Box
-            sx={{
-              borderRadius: "25px",
-              display: { xs: "block", md: "block" },
-              height: "150px",
-              paddingLeft: "20px",
-              background: "white",
-              color: "black",
-              marginLeft: "50px",
-              border: "3px solid #ba68c8",
-            }}
-          >
-            <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
-              Income Outstanding
-            </Typography>
-            <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
-              {unpaidIncome}
-            </Typography>
-          </Box>
+          {unpaidIncome && (
+            <Box
+              sx={{
+                marginTop: "20px",
+                borderRadius: "25px",
+                display: { xs: "block", md: "block" },
+                height: "150px",
+                paddingLeft: "20px",
+                background: "#676767",
+                color: "white",
+                marginLeft: "20px",
+              }}
+            >
+              <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
+                Income Outstanding
+              </Typography>
+              <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
+                {unpaidIncome}
+              </Typography>
+            </Box>
+          )}
         </Grid>
       </Grid>
       <Grid container xs={12}>

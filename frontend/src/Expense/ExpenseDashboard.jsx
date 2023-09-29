@@ -24,54 +24,63 @@ export default function ExpenseDashboard() {
   return (
     <Grid container>
       <Grid container xs>
-        <Grid item xl={2} md={3} xs={4}>
+        <Grid item xl={3} md={3} xs={5}>
           <Box
             sx={{
-              boxShadow: "10px 10px 4px 0px #00000050",
-              borderRadius: "5px",
+              marginTop: "20px",
+              borderRadius: "25px",
               display: { xs: "block", md: "block" },
               height: "150px",
               paddingLeft: "20px",
+              background: "#676767",
+              color: "white",
+              marginLeft: "50px",
             }}
           >
             <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
               Direct Expense
             </Typography>
-            <Typography
-              sx={{ color: "red", fontSize: { md: "30px", xs: "1rem" } }}
-            >
+            <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
               {totalExpense && `-${totalExpense}`}
             </Typography>
           </Box>
         </Grid>
-        <Grid item xl={1} xs={2} md={2}></Grid>
         <Grid item xl={3} md={3} xs={4}>
-          <Box
-            sx={{
-              boxShadow: "10px 10px 4px 0px #00000050",
-              borderRadius: "5px",
-
-              height: "150px",
-            }}
-          >
-            <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
-              Indirect expense
-            </Typography>
-            <Typography
-              sx={{ color: "red", fontSize: { md: "30px", xs: "1rem" } }}
+          {unpaidExpense && (
+            <Box
+              sx={{
+                marginTop: "20px",
+                borderRadius: "25px",
+                display: { xs: "block", md: "block" },
+                height: "150px",
+                paddingLeft: "20px",
+                background: "#676767",
+                color: "white",
+                marginLeft: "20px",
+              }}
             >
-              {unpaidExpense && `-${unpaidExpense}`}
-            </Typography>
-          </Box>
+              <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
+                Indirect Expense
+              </Typography>
+              <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
+                {unpaidExpense && `-${unpaidExpense}`}
+              </Typography>
+            </Box>
+          )}
         </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Typography sx={{ fontSize: "220%", color: "secondary" }}>
-          Expense
-        </Typography>
+      <Grid container xs={12}>
+        <Grid item md={6}>
+          <Typography sx={{ fontSize: "220%", color: "secondary" }}>
+            Expense Record
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <ExpenseRecord />
+      <Grid container xs={12}>
+        <Grid item md={0.5}></Grid>
+        <Grid item md={12}>
+          <ExpenseRecord />
+        </Grid>
       </Grid>
     </Grid>
   );

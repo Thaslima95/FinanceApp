@@ -88,7 +88,6 @@ app.post('/addincome',(req,res)=>{
     const placeofsupply=req.body.PlaceofSupply;
     const particulars=req.body.Particulars;
     const psyear=req.body.PSYear;
-    const GSTN=req.body.GSTN;
     const GSTIN=req.body.GSTIN;
     const hsnsac=req.body.HSNSAC;
     const duedate = req.body.DueDate!=null ? new Date(req.body.DueDate).toISOString().slice(0, 19).replace('T', ' '):null;
@@ -101,8 +100,8 @@ app.post('/addincome',(req,res)=>{
     const balancedue=req.body.BalanceDue;
     const status=req.body.Status;
     const details=req.body.Items;
-    const sql="INSERT INTO income_table (CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate) VALUES ?";
-    const value=[[companyname,streetaddress,city,state,pincode,placeofsupply,duedate,GSTN,GSTIN,particulars,psyear,hsnsac,rate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate]];
+    const sql="INSERT INTO income_table (CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate) VALUES ?";
+    const value=[[companyname,streetaddress,city,state,pincode,placeofsupply,duedate,GSTIN,particulars,psyear,hsnsac,rate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate]];
     db.query(sql,[value],(err,data)=>{
      if(err){
         console.error("Error executing query: " + err.stack);
@@ -112,7 +111,7 @@ app.post('/addincome',(req,res)=>{
      req.body.id=id;
      const randomFilename = generateShortRandomName() + '.pdf';
     generatepdf.mypdf([req.body],randomFilename)
-    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}' where id=${id}`
+    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}',InvoiceNumber='PS/${psyear}/00${id}' where id=${id}`
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);
@@ -185,8 +184,8 @@ const companyname=req.body.CompanyName;
         })
       }
       else{
-        const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,State=?,Pincode=?,PlaceofSupply=?,GSTN=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
-db.query(sql,[companyname,streetaddress,city,state,pincode,placeofsupply,GSTN,GSTIN,particulars,psyear,hsnsac,rate,duedate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
+        const sql="UPDATE income_table SET CompanyName=?,StreetAddress=?,City=?,State=?,Pincode=?,PlaceofSupply=?,GSTIN=?,Particulars=?,PSYear=?,HSNSAC=?,Rate=?,DueDate=?,CGST=?,SGST=?,IGST=?,TotalAmount=?,BalanceDue=?,`Status`=?,Items=?,ActionDate=? where id=?";
+db.query(sql,[companyname,streetaddress,city,state,pincode,placeofsupply,GSTIN,particulars,psyear,hsnsac,rate,duedate,cgst,sgst,igst,totalamount,balancedue,status,details,actiondate,id],(err,data)=>{
      if(err){
         console.error("Error executing query: " + err.stack);
       return res.status(500).json({ error: "Database error" });
@@ -237,7 +236,7 @@ app.get('/getUnpaidTotalIncomeRate',(req,res)=>{
 
 app.get('/getincomedetails',(req,res)=>{
    
-    const sql="Select id,CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table where IsDeleted=0";
+    const sql="Select id,InvoiceNumber,CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,`Status`,Items,ActionDate,CreatedAt from income_table where IsDeleted=0";
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);
@@ -251,14 +250,22 @@ app.get('/getincomedetails',(req,res)=>{
 app.get('/getsingleincomedetails/:id',(req,res)=>{
     
     const id=req.params.id;
-    const sql=`Select id,CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTN,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,Status,Items,ActionDate,CreatedAt from income_table where id=${id}`;
+    const sql=`Select id,InvoiceNumber,CompanyName,StreetAddress,City,State,Pincode,PlaceofSupply,DueDate,GSTIN,Particulars,PSYear,HSNSAC,Rate,CGST,SGST,IGST,TotalAmount,BalanceDue,Status,Items,ActionDate,CreatedAt from income_table where id=${id}`;
     db.query(sql,(err,data)=>{
          if(err){
         console.error("Error executing query: " + err.stack);
       return res.status(500).json({ error: "Database error" });
     }
-        
-        return res.json(data)
+         const randomFilename = generateShortRandomName() + '.pdf';
+    generatepdf.mypdf(data,randomFilename)
+    const sql=`UPDATE income_table SET InvoiceFile='Invoice${randomFilename}',InvoiceNumber='PS/${data[0].PSYear}/00${id}' where id=${id}`
+    db.query(sql,(err,data)=>{
+         if(err){
+        console.error("Error executing query: " + err.stack);
+      return res.status(500).json({ error: "Database error" });
+    }
+         return res.status(200).json({"message":"Download Success"})
+    })
     })
 })
 
@@ -273,7 +280,7 @@ app.put('/deletesinglerecord/:id',(req,res)=>{
     if (data.affectedRows === 0) {
       return res.status(404).json({ error: "Record not found" });
     }
-    res.json({ message: "Record deleted successfully" });
+    res.status(300).json({ message: "Record deleted successfully" });
         
     })
 })
@@ -373,7 +380,7 @@ app.put('/deletesingleexpenserecord/:id',(req,res)=>{
     if (data.affectedRows === 0) {
       return res.status(404).json({ error: "Record not found" });
     }
-    res.json({ message: "Record deleted successfully" });
+    res.status(300).json({ message: "Record deleted successfully" });
         
     })
 })

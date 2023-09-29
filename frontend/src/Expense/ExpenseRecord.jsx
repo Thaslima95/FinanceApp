@@ -10,6 +10,15 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import { Grid } from "@mui/material";
 
 import axios from "axios";
 import {
@@ -23,63 +32,93 @@ import { randomId } from "@mui/x-data-grid-generator";
 import { useEffect, useState } from "react";
 import ApiCalls from "../API/ApiCalls";
 
-function EditToolbar(props) {
-  const { setRows, setRowModesModel } = props;
-
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [
-      ...oldRows,
-      {
-        id,
-        InvoiceNumber: "",
-        Particulars: "",
-        PaymentType: "",
-        Amount: "",
-        CGST: 0,
-        SGST: 0,
-        IGST: 0,
-        TotalAmount: "",
-        isNew: true,
-      },
-    ]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: "Particulural" },
-    }));
-  };
-
-  return (
-    <GridToolbarContainer>
-      <Button
-        color="secondary"
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={handleClick}
-      >
-        Add record
-      </Button>
-    </GridToolbarContainer>
-  );
-}
-
 export default function ExpenseRecord() {
   const [open, setOpen] = React.useState(false);
+  const [deleteopen, setdeleteOpen] = React.useState(false);
   const [deleteid, setDeleteId] = useState(0);
+  let updatedrow = [];
   const [rows, setRows] = useState([]);
+  const [fullWidth, setFullWidth] = React.useState(true);
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
+  const [adddetails, setAddDetails] = useState({
+    InvoiceNumber: "",
+    Particulars: "",
+    Amount: "",
+    CGST: "",
+    SGST: "",
+    IGST: "",
+    PaymentType: "",
+    DueDate: "",
+    ActionDate: "",
+
+    TotalAmount: 0,
+    BalanceDue: 0,
+  });
 
   const today = new Date().toISOString().split("T")[0];
-  const handleDelete = (id) => {
-    ApiCalls.deleteSingleExpense(id)
-      .then((res) => window.alert("deleted"))
-      .catch((err) => console.log(err));
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
     setOpen(false);
     window.location.reload();
   };
-  const handleClose = () => {
-    setOpen(false);
+  const handleDeleteClose = () => {
+    setdeleteOpen(false);
+    window.location.reload();
+  };
+  const handleaddExpense = () => {
+    if (
+      adddetails.InvoiceNumber == "" ||
+      adddetails.Particulars == "" ||
+      adddetails.Amount == null ||
+      adddetails.DueDate == null ||
+      adddetails.ActionDate == null ||
+      adddetails.PaymentType == ""
+    ) {
+      alert(`Mandatory fields should not be empty`);
+    } else {
+      const total =
+        (adddetails.CGST / 100) * adddetails.Amount +
+        (adddetails.SGST / 100) * adddetails.Amount +
+        (adddetails.IGST / 100) * adddetails.Amount +
+        adddetails.Amount;
+      setAddDetails({
+        ...adddetails,
+        TotalAmount: total,
+        BalanceDue: total,
+      });
+      if (actionTake) {
+        ApiCalls.updateExpense(adddetails.id, {
+          ...adddetails,
+          TotalAmount: total,
+          BalanceDue: total,
+        })
+          .then((res) => {
+            if (res.status == 200 || 201) {
+              window.alert("Expense Updated Successfully");
+              window.location.reload();
+            }
+          })
+          .catch((err) => window.alert("Sorry!Try Again"));
+      } else {
+        ApiCalls.addExpense({
+          ...adddetails,
+          TotalAmount: total,
+          BalanceDue: total,
+        })
+          .then((res) => {
+            if (res.status == 200 || 201) {
+              window.alert("Expense Created Successfully");
+              window.location.reload();
+            }
+          })
+          .catch((err) => window.alert("Sorry!Try Again"));
+      }
+    }
   };
 
   useEffect(() => {
@@ -89,24 +128,38 @@ export default function ExpenseRecord() {
       .catch((err) => console.log(err));
   }, []);
 
-  const handleRowEditStop = (params, event) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
-  };
-
-  const handleEditClick = (id) => () => {
+  const handleEditClick = (id) => {
     setActionTake(true);
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
+    setOpen(true);
+    updatedrow = rows.filter((e) => e.id == id);
+    console.log(updatedrow[0].ActionDate);
+    console.log(new Date(updatedrow[0].ActionDate).toISOString().split("T")[0]);
+    setAddDetails({
+      ...updatedrow[0],
+      ActionDate: new Date(updatedrow[0].ActionDate)
+        .toISOString()
+        .split("T")[0],
+    });
   };
 
   const handleSaveClick = (id) => () => {
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
-  const handleDeleteClick = (id) => () => {
+  const handleDeleteClick = (id) => {
     setDeleteId(id);
-    setOpen(true);
+    setdeleteOpen(true);
+  };
+
+  const handleDelete = (id) => {
+    ApiCalls.deleteSingleExpense(id)
+      .then((res) => {
+        if (res.status == 300 || 301) {
+          window.alert("Expense deleted");
+          window.location.reload();
+        }
+      })
+      .catch((err) => window.alert("Sorry!Try Again"));
   };
 
   const handleCancelClick = (id) => () => {
@@ -121,53 +174,6 @@ export default function ExpenseRecord() {
     }
   };
 
-  const processRowUpdate = (newRow) => {
-    if (
-      newRow.InvoiceNumber == "" ||
-      newRow.Particulars == "" ||
-      newRow.Amount == null ||
-      newRow.PaymentType == "" ||
-      newRow.DueDate == null
-    ) {
-      alert(`Mandatory fields should not be empty`);
-    } else {
-      const totalvalue =
-        (newRow.CGST / 100) * newRow.Amount +
-        (newRow.SGST / 100) * newRow.Amount +
-        (newRow.IGST / 100) * newRow.Amount +
-        newRow.Amount;
-      const updatedRow = {
-        ...newRow,
-        TotalAmount: totalvalue,
-        isNew: false,
-      };
-      newRow.TotalAmount = totalvalue;
-
-      if (actionTake) {
-        ApiCalls.updateExpense(newRow.id, newRow)
-          .then((res) => {
-            if (res.status == 200 || 201) {
-              window.alert("Record Updated Successfully");
-              window.location.reload();
-            }
-          })
-          .catch((err) => window.alert("Oops error occured"));
-        window.location.reload();
-      } else {
-        axios
-          .post("/addexpense", newRow)
-          .then((res) => {
-            if (res.status == 200 || 201) {
-              window.alert("Record Inserted Successfully");
-              window.location.reload();
-            }
-          })
-          .catch((err) => console.log(err));
-      }
-      return updatedRow;
-    }
-  };
-
   const handleRowModesModelChange = (newRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
@@ -178,61 +184,80 @@ export default function ExpenseRecord() {
       headerName: (
         <div>
           <b>Invoice Number </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
-      width: 120,
+      width: 140,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "Particulars",
       headerName: (
         <div>
           <b>Particulars </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
-      width: 120,
+      width: 130,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "Amount",
       headerName: (
         <div>
           <b>Amount </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
       type: "number",
-      width: 80,
+      width: 100,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "CGST",
-      headerName: "CGST %",
+      headerName: (
+        <div>
+          <b>CGST % </b>
+        </div>
+      ),
       type: "number",
-      width: 80,
+      width: 100,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "SGST",
-      headerName: "SGST %",
+      headerName: (
+        <div>
+          <b>SGST % </b>
+        </div>
+      ),
       type: "number",
-      width: 80,
+      width: 100,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "IGST",
-      headerName: "IGST %",
+      headerName: (
+        <div>
+          <b>IGST % </b>
+        </div>
+      ),
       type: "number",
-      width: 80,
+      width: 100,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "TotalAmount",
-      headerName: "TotalAmount",
+      headerName: (
+        <div>
+          <b>Total Amount </b>
+        </div>
+      ),
       type: "number",
-      width: 100,
+      width: 120,
       editable: true,
       renderCell: (params) => {
         const value = params.value || 0;
@@ -242,26 +267,26 @@ export default function ExpenseRecord() {
           </span>
         );
       },
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "PaymentType",
       headerName: (
         <div>
           <b>Payment Type </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
       width: 140,
       editable: true,
       type: "singleSelect",
       valueOptions: ["Direct", "Indirect"],
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "DueDate",
       headerName: (
         <div>
           <b>DueDate </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
       type: "date",
@@ -277,6 +302,7 @@ export default function ExpenseRecord() {
         return new Date(dueDate);
       },
       min: { today },
+      headerClassName: "super-app-theme--header",
     },
 
     {
@@ -284,7 +310,6 @@ export default function ExpenseRecord() {
       headerName: (
         <div>
           <b>ActionDate </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
       type: "date",
@@ -299,7 +324,8 @@ export default function ExpenseRecord() {
         }
         return new Date(actionDate);
       },
-      min: { today },
+
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "actions",
@@ -307,6 +333,7 @@ export default function ExpenseRecord() {
       headerName: "Actions",
       width: 100,
       cellClassName: "actions",
+      headerClassName: "super-app-theme--header",
 
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -314,15 +341,15 @@ export default function ExpenseRecord() {
         if (isInEditMode) {
           return [
             <GridActionsCellItem
-              icon={<SaveIcon sx={{ color: "secondary" }} />}
+              icon={<SaveIcon sx={{ color: "#676767" }} />}
               label="Save"
               sx={{
-                color: "secondary.main",
+                color: "#676767",
               }}
               onClick={handleSaveClick(id)}
             />,
             <GridActionsCellItem
-              icon={<CancelIcon sx={{ color: "secondary" }} />}
+              icon={<CancelIcon sx={{ color: "#676767" }} />}
               label="Cancel"
               className="textPrimary"
               onClick={handleCancelClick(id)}
@@ -333,17 +360,17 @@ export default function ExpenseRecord() {
 
         return [
           <GridActionsCellItem
-            icon={<EditIcon sx={{ color: "secondary" }} />}
+            icon={<EditIcon sx={{ color: "#676767" }} />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
+            onClick={() => handleEditClick(id)}
           />,
           <GridActionsCellItem
-            icon={<DeleteIcon sx={{ color: "secondary" }} />}
+            icon={<DeleteIcon sx={{ color: "#676767" }} />}
             label="Delete"
-            onClick={handleDeleteClick(id)}
+            onClick={() => handleDeleteClick(id)}
             sx={{
-              color: "secondary.main",
+              color: "#676767",
             }}
           />,
         ];
@@ -362,26 +389,201 @@ export default function ExpenseRecord() {
         "& .textPrimary": {
           color: "text.primary",
         },
+        "& .super-app-theme--header": {
+          backgroundColor: "#676767",
+          color: "white",
+          fontSize: "17px",
+        },
       }}
     >
+      <Button
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={handleClick}
+        sx={{ marginBottom: "50px", background: "#FBC91B" }}
+      >
+        Add record
+      </Button>
       <DataGrid
         rows={rows}
         columns={columns}
         editMode="row"
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}
-        onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
-        slots={{
-          toolbar: EditToolbar,
-        }}
         slotProps={{
           toolbar: { setRows, setRowModesModel },
         }}
       />
       <Dialog
+        fullWidth={fullWidth}
+        maxWidth="md"
         open={open}
         onClose={handleClose}
+      >
+        <DialogContent fullWidth>
+          <DialogContentText sx={{ fontWeight: 800 }}>
+            Add Expense Details
+          </DialogContentText>
+          <Grid container lg={12} sx={{ display: "flex" }}>
+            <Grid item lg={4}>
+              <TextField
+                id="filled-basic"
+                label={<span>Invoice Number</span>}
+                variant="filled"
+                onChange={(e) =>
+                  setAddDetails({
+                    ...adddetails,
+                    InvoiceNumber: e.target.value,
+                  })
+                }
+                sx={{ marginBottom: "28px" }}
+                value={adddetails.InvoiceNumber}
+              />
+              <TextField
+                id="standard-number"
+                label={<span>CGST %</span>}
+                type="number"
+                variant="standard"
+                sx={{ marginBottom: "25px", width: 218 }}
+                className="red-asterisk"
+                onChange={(e) =>
+                  setAddDetails({
+                    ...adddetails,
+                    CGST: Number(e.target.value),
+                  })
+                }
+                value={Number(adddetails.CGST) || ""}
+              />
+              <FormControl sx={{ m: 1, minWidth: 220 }}>
+                <InputLabel id="demo-simple-select-label">
+                  PaymentType <span style={{ color: "red" }}>*</span>
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={adddetails.PaymentType}
+                  label="Status"
+                  onChange={(e) =>
+                    setAddDetails({
+                      ...adddetails,
+                      PaymentType: e.target.value,
+                    })
+                  }
+                >
+                  <MenuItem value={"Direct"}>Direct</MenuItem>
+                  <MenuItem value={"Indirect"}>InDirect</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item lg={4}>
+              <TextField
+                id="filled-basic"
+                label={<span>Particulars</span>}
+                variant="filled"
+                onChange={(e) =>
+                  setAddDetails({
+                    ...adddetails,
+                    Particulars: e.target.value,
+                  })
+                }
+                sx={{ marginBottom: "26px" }}
+                value={adddetails.Particulars}
+              />
+
+              <TextField
+                id="standard-number"
+                label={
+                  <span>
+                    SGST % <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
+                type="number"
+                variant="standard"
+                sx={{ marginBottom: "25px", width: 218 }}
+                onChange={(e) =>
+                  setAddDetails({
+                    ...adddetails,
+                    SGST: Number(e.target.value),
+                  })
+                }
+                value={Number(adddetails.SGST) || ""}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label={<span>Due Date</span>}
+                  sx={{ m: 1, width: 200, marginTop: "10px" }}
+                  onChange={(e) =>
+                    setAddDetails({
+                      ...adddetails,
+                      DueDate: e,
+                    })
+                  }
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item lg={4}>
+              <TextField
+                id="standard-number"
+                label={<span>Amount</span>}
+                type="number"
+                variant="standard"
+                sx={{ marginTop: "10px", marginBottom: "26px", width: 218 }}
+                onChange={(e) =>
+                  setAddDetails({
+                    ...adddetails,
+                    Amount: Number(e.target.value),
+                  })
+                }
+                value={adddetails.Amount || ""}
+              />
+
+              <TextField
+                id="standard-number"
+                label={<span>IGST %</span>}
+                type="number"
+                variant="standard"
+                sx={{ marginBottom: "26px", width: 218 }}
+                onChange={(e) =>
+                  setAddDetails({
+                    ...adddetails,
+                    IGST: Number(e.target.value),
+                  })
+                }
+                value={Number(adddetails.IGST) || ""}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label={<span>Action Date</span>}
+                  sx={{ m: 1, width: 200 }}
+                  onChange={(e) =>
+                    setAddDetails({
+                      ...adddetails,
+                      ActionDate: e,
+                    })
+                  }
+                  // value={adddetails.ActionDate}
+                />
+              </LocalizationProvider>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            autoFocus
+            sx={{ background: "#FBC91B" }}
+            variant="contained"
+            onClick={() => handleaddExpense()}
+          >
+            {actionTake ? "UPDATE" : "ADD"}
+          </Button>
+          <Button onClick={() => handleClose()} autoFocus>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={deleteopen}
+        onClose={handleDeleteClose}
         aria-labelledby="responsive-dialog-title"
       >
         <DialogContent>
@@ -397,7 +599,7 @@ export default function ExpenseRecord() {
           >
             Yes
           </Button>
-          <Button onClick={handleClose} autoFocus>
+          <Button onClick={() => handleDeleteClose()} autoFocus>
             No
           </Button>
         </DialogActions>

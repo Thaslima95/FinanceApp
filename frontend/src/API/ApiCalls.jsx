@@ -34,6 +34,14 @@ export default {
       console.log(err);
     }
   },
+  donwloadInvoice: async function (id) {
+    try {
+      const response = await axios.get(`/getsingleincomedetails/${id}`);
+      return response.data;
+    } catch (err) {
+      console.log(err);
+    }
+  },
 
   deleteSingleIncome: async function (id) {
     try {
