@@ -9,6 +9,14 @@
 .red-asterisk label.MuiInputLabel-asterisk {
   color: red;
 }
+.css-5wly58-MuiDataGrid-root .MuiDataGrid-withBorderColor {
+  border-color: rgb(20 19 19);
+}
+
+.css-yrdy0g-MuiDataGrid-columnHeaderRow {
+  background: "purple" !important;
+  color: "white";
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {

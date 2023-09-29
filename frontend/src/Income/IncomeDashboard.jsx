@@ -29,19 +29,19 @@ export default function IncomeDashboard() {
         <Grid item xl={2} md={3} xs={4}>
           <Box
             sx={{
-              boxShadow: "10px 10px 4px 0px #00000050",
-              borderRadius: "5px",
+              borderRadius: "25px",
               display: { xs: "block", md: "block" },
               height: "150px",
               paddingLeft: "20px",
+              background: "#ba68c8",
+              color: "white",
+              marginLeft: "50px",
             }}
           >
             <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
-              Income
+              Paid Income
             </Typography>
-            <Typography
-              sx={{ color: "green", fontSize: { md: "30px", xs: "1rem" } }}
-            >
+            <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
               {totalIncome ? `+${totalIncome}` : 0}
             </Typography>
           </Box>
@@ -50,30 +50,37 @@ export default function IncomeDashboard() {
         <Grid item xl={3} md={3} xs={4}>
           <Box
             sx={{
-              boxShadow: "10px 10px 4px 0px #00000050",
-              borderRadius: "5px",
-
+              borderRadius: "25px",
+              display: { xs: "block", md: "block" },
               height: "150px",
+              paddingLeft: "20px",
+              background: "white",
+              color: "black",
+              marginLeft: "50px",
+              border: "3px solid #ba68c8",
             }}
           >
             <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
               Income Outstanding
             </Typography>
-            <Typography
-              sx={{ color: "red", fontSize: { md: "30px", xs: "1rem" } }}
-            >
+            <Typography sx={{ fontSize: { md: "30px", xs: "1rem" } }}>
               {unpaidIncome}
             </Typography>
           </Box>
         </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Typography sx={{ fontSize: "220%", color: "secondary" }}>
-          Income Outstanding
-        </Typography>
+      <Grid container xs={12}>
+        <Grid item md={6}>
+          <Typography sx={{ fontSize: "220%", color: "secondary" }}>
+            Income Outstanding
+          </Typography>
+        </Grid>
       </Grid>
-      <Grid item xs={12}>
-        <Income />
+      <Grid container xs={12}>
+        <Grid item md={0.5}></Grid>
+        <Grid item md={12}>
+          <Income />
+        </Grid>
       </Grid>
     </Grid>
   );

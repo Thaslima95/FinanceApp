@@ -53,6 +53,7 @@ export default function Income2() {
 
   const [rowModesModel, setRowModesModel] = useState({});
   const [actionTake, setActionTake] = useState(false);
+  const [paymentreceipt, setPaymentReceipt] = useState(false);
   const [adddetails, setAddDetails] = useState({
     CompanyName: "",
     StreetAddress: "",
@@ -64,11 +65,11 @@ export default function Income2() {
     Particulars: "",
     PSYear: "23-24",
     Items: "",
-    HSNSAC: 0,
-    Rate: 0,
-    CGST: 0,
-    SGST: 0,
-    IGST: 0,
+    HSNSAC: "",
+    Rate: "",
+    CGST: "",
+    SGST: "",
+    IGST: "",
     Status: "",
     DueDate: "",
     ActionDate: "",
@@ -93,6 +94,7 @@ export default function Income2() {
       adddetails.HSNSAC == "" ||
       adddetails.Rate == null ||
       adddetails.DueDate == null ||
+      adddetails.ActionDate == null ||
       adddetails.Status == ""
     ) {
       alert(`Mandatory fields should not be empty`);
@@ -108,7 +110,11 @@ export default function Income2() {
         BalanceDue: total,
       });
       if (actionTake) {
-        ApiCalls.updateIncome(adddetails.id, adddetails)
+        ApiCalls.updateIncome(adddetails.id, {
+          ...adddetails,
+          TotalAmount: total,
+          BalanceDue: total,
+        })
           .then((res) => {
             if (res.status == 200 || 201) {
               window.alert("Record Update Sucess");
@@ -159,11 +165,7 @@ export default function Income2() {
     setActionTake(true);
     setOpen(true);
     updatedrow = rows.filter((e) => e.id == id);
-    setUpdateRow(updatedrow);
-    console.log(updatedrow);
-    localStorage.setItem("row", JSON.stringify(updatedrow));
     setAddDetails(updatedrow[0]);
-    // setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
   const handleSaveClick = (id) => () => {
@@ -187,132 +189,50 @@ export default function Income2() {
     }
   };
 
-  const processRowUpdate = (newRow) => {
-    if (
-      newRow.CompanyName == "" ||
-      newRow.StreetAddress == "" ||
-      newRow.City == "" ||
-      newRow.State == "" ||
-      newRow.Pincode == null ||
-      newRow.PlaceofSupply == "" ||
-      newRow.GSTN == "" ||
-      newRow.GSTIN == "" ||
-      newRow.Particulars == "" ||
-      newRow.Items == "" ||
-      newRow.HSNSAC == "" ||
-      newRow.Rate == null ||
-      newRow.DueDate == null ||
-      newRow.Status == ""
-    ) {
-      alert(`Mandatory fields should not be empty`);
-    } else {
-      const totalvalue =
-        (newRow.CGST / 100) * newRow.Rate +
-        (newRow.SGST / 100) * newRow.Rate +
-        (newRow.IGST / 100) * newRow.Rate +
-        newRow.Rate;
-      const updatedRow = {
-        ...newRow,
-        TotalAmount: totalvalue,
-        BalanceDue: totalvalue,
-        isNew: false,
-      };
-      newRow.TotalAmount = totalvalue;
-      newRow.BalanceDue = totalvalue;
-
-      if (actionTake) {
-        ApiCalls.updateIncome(newRow.id, newRow)
-          .then((res) => {
-            if (res.status == 200 || 201) {
-              window.alert("Record Update Sucess");
-              window.location.reload();
-            }
-          })
-          .catch((err) => window.alert("Oops! some error occured"));
-      } else {
-        ApiCalls.addIncome(newRow)
-          .then((res) => {
-            if (res.status == 200 || 201) {
-              window.alert("Record Inserted Successfully");
-              window.location.reload();
-            }
-          })
-          .catch((err) => window.alert("Oops! some error occured"));
-      }
-      return updatedRow;
-    }
-  };
-
-  const handleRowModesModelChange = (newRowModesModel) => {
-    setRowModesModel(newRowModesModel);
-  };
-
   const columns = [
     {
       field: "CompanyName",
       headerName: (
         <div>
           <b>Company Name </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
-      width: 120,
+      width: 140,
       editable: true,
-    },
-
-    {
-      field: "GSTN",
-      headerName: (
-        <div>
-          <b>GSTN</b> <span style={{ color: "red" }}>*</span>
-        </div>
-      ),
-      width: 120,
-      editable: true,
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "Particulars",
       headerName: (
         <div>
-          <b>Particulars</b> <span style={{ color: "red" }}>*</span>
+          <b>Particulars</b>
         </div>
       ),
       width: 120,
       editable: true,
+      headerClassName: "super-app-theme--header",
     },
 
-    {
-      field: "HSNSAC",
-      headerName: (
-        <div>
-          <b>HSNSAC</b> <span style={{ color: "red" }}>*</span>
-        </div>
-      ),
-      type: "number",
-      width: 100,
-      editable: true,
-      renderCell: (params) => {
-        const value = params.value || 0;
-        return <span>{value}</span>;
-      },
-    },
     {
       field: "Rate",
       headerName: (
         <div>
-          <b>Rate</b> <span style={{ color: "red" }}>*</span>
+          <b>Rate</b>
         </div>
       ),
       type: "number",
       width: 100,
       editable: true,
+      headerAlign: "left",
+      headerClassName: "super-app-theme--header",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "DueDate",
       headerName: (
         <div>
           <b>DueDate </b>
-          <span style={{ color: "red" }}>*</span>
         </div>
       ),
       type: "date",
@@ -328,34 +248,60 @@ export default function Income2() {
         return new Date(dueDate);
       },
       min: { today },
+      headerClassName: "super-app-theme--header",
     },
 
     {
       field: "CGST",
-      headerName: "CGST %",
+      headerName: (
+        <div>
+          <b>CGST % </b>
+        </div>
+      ),
       type: "number",
       width: 80,
       editable: true,
+      headerClassName: "super-app-theme--header",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "SGST",
-      headerName: "SGST %",
+      headerName: (
+        <div>
+          <b>SGST % </b>
+        </div>
+      ),
       type: "number",
       width: 80,
       editable: true,
+      headerClassName: "super-app-theme--header",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "IGST",
-      headerName: "IGST %",
+      headerName: (
+        <div>
+          <b>IGST % </b>
+        </div>
+      ),
       type: "number",
       width: 80,
       editable: true,
+      headerClassName: "super-app-theme--header",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "TotalAmount",
-      headerName: "TotalAmount",
+      headerName: (
+        <div>
+          <b>Total Amount</b>
+        </div>
+      ),
       type: "number",
-      width: 100,
+      width: 120,
       editable: true,
       renderCell: (params) => {
         const value = params.value || 0;
@@ -365,29 +311,41 @@ export default function Income2() {
           </span>
         );
       },
+      headerClassName: "super-app-theme--header",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "BalanceDue",
-      headerName: "BalanceDue",
+      headerName: (
+        <div>
+          <b>Balance Due</b>
+        </div>
+      ),
       type: "number",
-      width: 100,
+      width: 120,
       editable: true,
+      headerClassName: "super-app-theme--header",
+      headerAlign: "left",
+      align: "left",
     },
     {
       field: "Status",
       headerName: (
         <div>
-          <b>Status</b> <span style={{ color: "red" }}>*</span>
+          <b>Status</b>
         </div>
       ),
       width: 100,
       editable: true,
       type: "singleSelect",
-      valueOptions: ["Paid", "UnPaid", "Overdue"],
       renderCell: (params) => {
         const value = params.value;
+        if (params.value == "Paid") {
+          setPaymentReceipt(true);
+        }
         let color = "";
-        if (params.value == "UnPaid" || "Overdue") {
+        if (params.value == "UnPaid" || "Overdue" || "Declined") {
           color = "red";
         } else {
           color = "";
@@ -396,17 +354,26 @@ export default function Income2() {
         return (
           <span
             style={{
-              color: (value == "UnPaid" || value == "Overdue") && "red",
+              color:
+                (value == "UnPaid" ||
+                  value == "Overdue" ||
+                  value == "Declined") &&
+                "red",
             }}
           >
             {value}
           </span>
         );
       },
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "ActionDate",
-      headerName: "ActionDate",
+      headerName: (
+        <div>
+          <b>Action Date</b>
+        </div>
+      ),
       type: "date",
       width: 120,
       align: "left",
@@ -420,6 +387,7 @@ export default function Income2() {
         return new Date(actionDate);
       },
       min: { today },
+      headerClassName: "super-app-theme--header",
     },
     {
       field: "actions",
@@ -427,6 +395,7 @@ export default function Income2() {
       headerName: "Actions",
       width: 100,
       cellClassName: "actions",
+      headerClassName: "super-app-theme--header",
 
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
@@ -482,6 +451,12 @@ export default function Income2() {
         "& .textPrimary": {
           color: "text.primary",
         },
+        "& .super-app-theme--header": {
+          backgroundColor: "#9c27b0",
+          color: "white",
+          fontSize: "17px",
+          // borderRadius: "5px",
+        },
       }}
     >
       <Button
@@ -489,6 +464,7 @@ export default function Income2() {
         variant="contained"
         startIcon={<AddIcon />}
         onClick={handleClick}
+        sx={{ marginBottom: "50px" }}
       >
         Add record
       </Button>
@@ -498,12 +474,13 @@ export default function Income2() {
         columns={columns}
         editMode="row"
         rowModesModel={rowModesModel}
-        onRowModesModelChange={handleRowModesModelChange}
+        // onRowModesModelChange={handleRowModesModelChange}
         onRowEditStop={handleRowEditStop}
-        processRowUpdate={processRowUpdate}
+        // processRowUpdate={processRowUpdate}
         slotProps={{
           toolbar: { setRows, setRowModesModel },
         }}
+        columnBuffer={5}
       />
       <Dialog
         fullWidth={fullWidth}
@@ -537,11 +514,7 @@ export default function Income2() {
 
               <TextField
                 id="standard-number"
-                label={
-                  <span style={{ marginTop: -20 }}>
-                    Pincode<span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span style={{ marginTop: -20 }}>Pincode</span>}
                 type="number"
                 variant="standard"
                 sx={{ marginBottom: "20px", width: 218 }}
@@ -555,11 +528,7 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    GSTN <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>GSTN</span>}
                 variant="filled"
                 sx={{ marginBottom: "20px" }}
                 onChange={(e) =>
@@ -572,11 +541,7 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    Items <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>Items</span>}
                 variant="filled"
                 sx={{ marginBottom: "20px" }}
                 onChange={(e) =>
@@ -589,11 +554,7 @@ export default function Income2() {
               />
               <TextField
                 id="standard-number"
-                label={
-                  <span>
-                    CGST % <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>CGST %</span>}
                 type="number"
                 variant="standard"
                 sx={{ marginBottom: "25px", width: 218 }}
@@ -604,7 +565,7 @@ export default function Income2() {
                     CGST: Number(e.target.value),
                   })
                 }
-                value={adddetails.CGST}
+                value={Number(adddetails.CGST) || ""}
               />
               <FormControl sx={{ m: 1, minWidth: 220 }}>
                 <InputLabel id="demo-simple-select-label">
@@ -624,7 +585,7 @@ export default function Income2() {
                 >
                   <MenuItem value={"Paid"}>Paid</MenuItem>
                   <MenuItem value={"UnPaid"}>UnPaid</MenuItem>
-                  <MenuItem value={"OverDue"}>Over Due</MenuItem>
+                  <MenuItem value={"Overdue"}>Over Due</MenuItem>
                   <MenuItem value={"Declined"}>Declined</MenuItem>
                 </Select>
               </FormControl>
@@ -632,11 +593,7 @@ export default function Income2() {
             <Grid item lg={4}>
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    Street Address <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>Street Address</span>}
                 variant="filled"
                 onChange={(e) =>
                   setAddDetails({
@@ -649,11 +606,7 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    State <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>State</span>}
                 variant="filled"
                 sx={{ marginBottom: "20px" }}
                 onChange={(e) =>
@@ -666,11 +619,7 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    Particulars <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>Particulars</span>}
                 variant="filled"
                 sx={{ marginBottom: "28px" }}
                 onChange={(e) =>
@@ -683,11 +632,7 @@ export default function Income2() {
               />
               <TextField
                 id="standard-number"
-                label={
-                  <span>
-                    HSNSAC <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>HSNSAC</span>}
                 type="number"
                 variant="standard"
                 sx={{ marginBottom: "20px", width: 218 }}
@@ -697,7 +642,7 @@ export default function Income2() {
                     HSNSAC: Number(e.target.value),
                   })
                 }
-                value={adddetails.HSNSAC}
+                value={adddetails.HSNSAC || ""}
               />
               <TextField
                 id="standard-number"
@@ -715,15 +660,11 @@ export default function Income2() {
                     SGST: Number(e.target.value),
                   })
                 }
-                value={adddetails.SGST}
+                value={Number(adddetails.SGST) || ""}
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label={
-                    <span>
-                      Due Date <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
+                  label={<span>Due Date</span>}
                   sx={{ m: 1, width: 200 }}
                   onChange={(e) =>
                     setAddDetails({
@@ -737,11 +678,7 @@ export default function Income2() {
             <Grid item lg={4}>
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    City <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>City</span>}
                 variant="filled"
                 sx={{ marginBottom: "20px" }}
                 onChange={(e) =>
@@ -754,11 +691,7 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    Place of Supply<span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>Place of Supply</span>}
                 variant="filled"
                 sx={{ marginBottom: "20px" }}
                 onChange={(e) =>
@@ -771,11 +704,7 @@ export default function Income2() {
               />
               <TextField
                 id="filled-basic"
-                label={
-                  <span>
-                    PS Year <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>PS Year</span>}
                 variant="filled"
                 sx={{ marginBottom: "28px" }}
                 onChange={(e) =>
@@ -788,11 +717,7 @@ export default function Income2() {
               />
               <TextField
                 id="standard-number"
-                label={
-                  <span>
-                    Rate <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>Rate</span>}
                 type="number"
                 variant="standard"
                 sx={{ marginBottom: "20px", width: 218 }}
@@ -802,15 +727,11 @@ export default function Income2() {
                     Rate: Number(e.target.value),
                   })
                 }
-                value={adddetails.Rate}
+                value={Number(adddetails.Rate) || ""}
               />
               <TextField
                 id="standard-number"
-                label={
-                  <span>
-                    IGST % <span style={{ color: "red" }}>*</span>
-                  </span>
-                }
+                label={<span>IGST %</span>}
                 type="number"
                 variant="standard"
                 sx={{ marginBottom: "25px", width: 218 }}
@@ -820,21 +741,22 @@ export default function Income2() {
                     IGST: Number(e.target.value),
                   })
                 }
-                value={adddetails.IGST}
+                value={Number(adddetails.IGST) || ""}
               />
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label={
-                    <span>
-                      Action Date <span style={{ color: "red" }}>*</span>
-                    </span>
-                  }
+                  label={<span>Action Date</span>}
                   sx={{ m: 1, width: 200 }}
                   onChange={(e) =>
                     setAddDetails({
                       ...adddetails,
                       ActionDate: e,
                     })
+                  }
+                  value={
+                    adddetails.ActionDate
+                      ? new AdapterDayjs(adddetails.ActionDate)
+                      : null
                   }
                 />
               </LocalizationProvider>
